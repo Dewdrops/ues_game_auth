@@ -60,6 +60,7 @@ class AuthService
 //                $user->wx_unionid = $decrypted['unionid'];
 //            }
         }
+        $user->save();
 
         $expired = time() + config('app.jwt.expiry_period');
         $payload = [
