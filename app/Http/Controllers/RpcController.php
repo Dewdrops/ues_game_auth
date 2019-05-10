@@ -13,7 +13,6 @@ use App\Services\AuthService;
 use App\Support\RpcParams;
 use App\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -28,6 +27,23 @@ class RpcController extends Controller
             $params['code'],
             $params->get('iv'),
             $params->get('encrypted')
+        );
+    }
+
+    public function loginByPassword(AuthService $service, RpcParams $params)
+    {
+        return $service->loginByPassword($params['username'], $params['password']);
+    }
+
+    public function register(AuthService $service, RpcParams $params)
+    {
+        return $service->register($params['username'], $params['password']);
+    }
+
+    public function bindWechat(AuthService $service, RpcParams $params)
+    {
+        return $service->bindWechat(
+            $params['id'], $params['code'], $params->get("allowRefresh", false)
         );
     }
 

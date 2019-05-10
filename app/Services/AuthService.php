@@ -13,6 +13,7 @@ use App\Exceptions\AuthException;
 use App\User;
 use Firebase\JWT\ExpiredException;
 use Firebase\JWT\JWT;
+use Illuminate\Support\Facades\Hash;
 
 class AuthService
 {
@@ -33,8 +34,84 @@ class AuthService
             return $decoded;
         }
         catch (ExpiredException $exception) {
-            throw new AuthException("Login session expired", AuthException::CODE_LOGIN_SESSION_EXPIRED);
+            throw new AuthException("Login session expired", AuthException::CODE_SESSION_EXPIRED);
         }
+    }
+
+    public function register(string $username, string $password): array
+    {
+        $user = new User();
+        $user->password = Hash::make($password);
+        $user->username = $username;
+
+        try {
+            $user->save();
+        }
+        catch (\Exception $e) {
+            if ($e->getCode() === "23505") {
+                throw new AuthException(
+                    "Duplicate username [$username]",
+                    AuthException::CODE_DUPLICATE_USERNAME
+                );
+            }
+            throw $e;
+        }
+
+        return [
+            'id' => $user->id,
+            'token' => $this->generateToken([
+                'user_id' => $user->id,
+            ])
+        ];
+    }
+
+    public function bindWechat(int $id, string $code, bool $allowRefresh)
+    {
+        $user = User::findOrFail($id, ['wx_openid']);
+
+        $refreshed = false;
+        if ($user->wx_openid) {
+            if ($allowRefresh) {
+                $refreshed = true;
+            }
+            else {
+                throw new AuthException("Wechat has bound", AuthException::CODE_DUPLICATE_BIND);
+            }
+        }
+
+        $wechat = app(WechatService::class);
+        $sessionInfo = $wechat->session($code);
+        $user->wx_session_key = $sessionInfo['session_key'];
+        $user->wx_openid = $sessionInfo['openid'];
+        $user->save();
+
+        return [
+            'refreshed' => $refreshed
+        ];
+    }
+
+    public function loginByPassword(string $username, string $password): array
+    {
+        $user = User::where([
+            'username' => $username,
+        ])
+            ->select(['id', 'password'])
+            ->first();
+
+        if (!$user) {
+            throw new AuthException("User[$username] not existed", AuthException::CODE_PASSWORD_WRONG);
+        }
+
+        if (!Hash::check($password, $user->password)) {
+            throw new AuthException("Password wrong for user[$username]", AuthException::CODE_PASSWORD_WRONG);
+        }
+
+        return [
+            'id' => $user->id,
+            'token' => $this->generateToken([
+                'user_id' => $user->id,
+            ])
+        ];
     }
 
     public function loginByWechat(string $code, $iv = null, $encrypted = null): array
@@ -62,12 +139,9 @@ class AuthService
         }
         $user->save();
 
-        $expired = time() + config('app.jwt.expiry_period');
-        $payload = [
+        $token = $this->generateToken([
             'user_id' => $user->id,
-            'exp' => $expired
-        ];
-        $token = JWT::encode($payload, $this->jwt_secret, $this->jwt_alg);
+        ]);
         $user->token = $token;
         $user->save();
 
@@ -81,6 +155,13 @@ class AuthService
         }
 
         return $ret;
+    }
+
+    private function generateToken(array $payload): string
+    {
+        $expired = time() + config('app.jwt.expiry_period');
+        $payload['exp'] = $expired;
+        return JWT::encode($payload, $this->jwt_secret, $this->jwt_alg);
     }
 
 }

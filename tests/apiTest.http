@@ -18,3 +18,45 @@ Content-Type: application/json
 }
 
 ###
+
+POST http://localhost:5000/rpc?XDEBUG_SESSION_START=17185
+Authorization: Bearer Debug-User-Id:2
+Content-Type: application/json
+
+{
+  "method": "register",
+  "params": {
+    "username": "test name",
+    "password": "123456"
+  }
+}
+
+###
+
+POST http://localhost:5000/rpc?XDEBUG_SESSION_START=17185
+Authorization: Bearer Debug-User-Id:2
+Content-Type: application/json
+
+{
+  "method": "loginByPassword",
+  "params": {
+    "username": "test name",
+    "password": "123456"
+  }
+}
+
+###
+
+POST http://localhost:5000/rpc?XDEBUG_SESSION_START=17185
+Authorization: Bearer Debug-User-Id:2
+Content-Type: application/json
+
+{
+  "method": "bindWechat",
+  "params": {
+    "id": 3,
+    "code": "123456"
+  }
+}
+
+###

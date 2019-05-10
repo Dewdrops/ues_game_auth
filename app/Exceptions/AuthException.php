@@ -11,5 +11,10 @@ namespace App\Exceptions;
 
 class AuthException extends \Exception
 {
-    const CODE_LOGIN_SESSION_EXPIRED = 22;
+    const CODE_SESSION_EXPIRED = 22;
+
+    const CODE_PASSWORD_WRONG = 24;
+
+    const CODE_DUPLICATE_USERNAME = 25;
+    const CODE_DUPLICATE_BIND = 26;
 }
