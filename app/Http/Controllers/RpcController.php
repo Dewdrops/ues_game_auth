@@ -9,6 +9,7 @@
 namespace App\Http\Controllers;
 
 
+use App\Exceptions\AuthException;
 use App\Services\AuthService;
 use App\Support\RpcParams;
 use App\User;
@@ -35,6 +36,11 @@ class RpcController extends Controller
         return $service->loginByPassword($params['username'], $params['password']);
     }
 
+    public function loginAsGuest(AuthService $service, RpcParams $params)
+    {
+        return $service->loginAsGuest($params['userId']);
+    }
+
     public function register(AuthService $service, RpcParams $params)
     {
         return $service->register($params['username'], $params['password']);
@@ -44,6 +50,13 @@ class RpcController extends Controller
     {
         return $service->bindWechat(
             $params['id'], $params['code'], $params->get("allowRefresh", false)
+        );
+    }
+
+    public function bindPassword(AuthService $service, RpcParams $params)
+    {
+        return $service->bindPassword(
+            $params['id'], $params['username'], $params['password'], $params->get("allowRefresh", false)
         );
     }
 
@@ -68,7 +81,7 @@ class RpcController extends Controller
             Log::error("{$exception->getMessage()}, stack: {$exception->getTraceAsString()}");
             $wrapped = [
                 'error' => [
-                    'code' => $exception->getCode() ?? -1,
+                    'code' => $exception->getCode() ?: AuthException::CODE_AUTH_FAILED,
                     'message' => $exception->getMessage(),
                 ]
             ];

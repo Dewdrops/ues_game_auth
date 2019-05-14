@@ -18,19 +18,12 @@ use Illuminate\Support\Facades\Hash;
 class AuthService
 {
 
-    private $jwt_secret;
-    private $jwt_alg;
-
-    public function __construct()
-    {
-        $this->jwt_secret = config('app.jwt.jwt_secret');
-        $this->jwt_alg = config('app.jwt.jwt_alg');
-    }
-
     public function checkToken(string $token)
     {
         try {
-            $decoded = JWT::decode($token, $this->jwt_secret, [$this->jwt_alg]);
+            $jwtSecret = config('app.jwt.jwt_secret');
+            $jwtAlg = config('app.jwt.jwt_alg');
+            $decoded = JWT::decode($token, $jwtSecret, [$jwtAlg]);
             return $decoded;
         }
         catch (ExpiredException $exception) {
@@ -44,30 +37,17 @@ class AuthService
         $user->password = Hash::make($password);
         $user->username = $username;
 
-        try {
-            $user->save();
-        }
-        catch (\Exception $e) {
-            if ($e->getCode() === "23505") {
-                throw new AuthException(
-                    "Duplicate username [$username]",
-                    AuthException::CODE_DUPLICATE_USERNAME
-                );
-            }
-            throw $e;
-        }
+        $user->tryInsert(true);
 
         return [
             'id' => $user->id,
-            'token' => $this->generateToken([
-                'user_id' => $user->id,
-            ])
+            'token' => $user->token
         ];
     }
 
     public function bindWechat(int $id, string $code, bool $allowRefresh)
     {
-        $user = User::findOrFail($id, ['wx_openid']);
+        $user = User::findOrFail($id, ['id', 'wx_openid']);
 
         $refreshed = false;
         if ($user->wx_openid) {
@@ -83,7 +63,31 @@ class AuthService
         $sessionInfo = $wechat->session($code);
         $user->wx_session_key = $sessionInfo['session_key'];
         $user->wx_openid = $sessionInfo['openid'];
-        $user->save();
+
+        $user->tryInsert(false);
+
+        return [
+            'refreshed' => $refreshed
+        ];
+    }
+
+    public function bindPassword(int $id, string $username, string $password, bool $allowRefresh)
+    {
+        $user = User::findOrFail($id, ['id', 'username']);
+
+        $refreshed = false;
+        if ($user->username) {
+            if ($allowRefresh) {
+                $refreshed = true;
+            }
+            else {
+                throw new AuthException("Password has bound for user id[$id]", AuthException::CODE_DUPLICATE_BIND);
+            }
+        }
+
+        $user->username = $username;
+        $user->password = Hash::make($password);
+        $user->tryInsert(false);
 
         return [
             'refreshed' => $refreshed
@@ -106,11 +110,30 @@ class AuthService
             throw new AuthException("Password wrong for user[$username]", AuthException::CODE_PASSWORD_WRONG);
         }
 
+        $token = $user->saveToken();
+
         return [
             'id' => $user->id,
-            'token' => $this->generateToken([
-                'user_id' => $user->id,
-            ])
+            'token' => $token
+        ];
+    }
+
+    public function loginAsGuest(?int $userId)
+    {
+        if ($userId === null) {
+            $user = new User();
+            $user->save();
+            $userId = $user->id;
+        }
+        else {
+            $user = User::findOrFail($userId);
+        }
+
+        $token = $user->saveToken();
+
+        return [
+            'id' => $userId,
+            'token' => $token
         ];
     }
 
@@ -132,18 +155,10 @@ class AuthService
             $user = new User();
             $user->wx_session_key = $sessionKey;
             $user->wx_openid = $openid;
-//            if ($iv !== null) {
-//                $decrypted = $wechat->decryptUserData($sessionKey, $iv, $encrypted);
-//                $user->wx_unionid = $decrypted['unionid'];
-//            }
         }
         $user->save();
 
-        $token = $this->generateToken([
-            'user_id' => $user->id,
-        ]);
-        $user->token = $token;
-        $user->save();
+        $token = $user->saveToken();
 
         $ret = [
             'id' => $user->id,
@@ -155,13 +170,6 @@ class AuthService
         }
 
         return $ret;
-    }
-
-    private function generateToken(array $payload): string
-    {
-        $expired = time() + config('app.jwt.expiry_period');
-        $payload['exp'] = $expired;
-        return JWT::encode($payload, $this->jwt_secret, $this->jwt_alg);
     }
 
 }
