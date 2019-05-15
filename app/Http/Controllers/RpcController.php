@@ -36,9 +36,14 @@ class RpcController extends Controller
         return $service->loginByPassword($params['username'], $params['password']);
     }
 
-    public function loginAsGuest(AuthService $service, RpcParams $params)
+    public function loginByToken(AuthService $service, RpcParams $params)
     {
-        return $service->loginAsGuest($params['userId']);
+        return $service->loginByToken($params['token']);
+    }
+
+    public function loginAsGuest(AuthService $service)
+    {
+        return $service->loginAsGuest();
     }
 
     public function register(AuthService $service, RpcParams $params)

@@ -27,12 +27,14 @@ class User extends BaseModel implements AuthenticatableContract, AuthorizableCon
         'data' => 'array'
     ];
 
-    public function saveToken(): string
+    public function saveToken(bool $willExpire = true): string
     {
         $payload = [
             'user_id' => $this->id,
-            'exp' => time() + config('app.jwt.expiry_period')
         ];
+        if ($willExpire) {
+            $payload['exp'] = time() + config('app.jwt.expiry_period');
+        }
         $jwtSecret = config('app.jwt.jwt_secret');
         $jwtAlg = config('app.jwt.jwt_alg');
         $this->token = JWT::encode($payload, $jwtSecret, $jwtAlg);
@@ -41,7 +43,7 @@ class User extends BaseModel implements AuthenticatableContract, AuthorizableCon
         return $this->token;
     }
 
-    public function tryInsert(bool $resetToken)
+    public function tryInsert()
     {
         try {
             $this->save();
@@ -55,8 +57,6 @@ class User extends BaseModel implements AuthenticatableContract, AuthorizableCon
             }
             throw $e;
         }
-        if ($resetToken) {
-            $this->saveToken();
-        }
+        $this->saveToken(true);
     }
 }

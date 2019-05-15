@@ -37,7 +37,7 @@ class AuthService
         $user->password = Hash::make($password);
         $user->username = $username;
 
-        $user->tryInsert(true);
+        $user->tryInsert();
 
         return [
             'id' => $user->id,
@@ -64,10 +64,11 @@ class AuthService
         $user->wx_session_key = $sessionInfo['session_key'];
         $user->wx_openid = $sessionInfo['openid'];
 
-        $user->tryInsert(false);
+        $user->tryInsert();
 
         return [
-            'refreshed' => $refreshed
+            'refreshed' => $refreshed,
+            'token' => $user->token,
         ];
     }
 
@@ -87,10 +88,11 @@ class AuthService
 
         $user->username = $username;
         $user->password = Hash::make($password);
-        $user->tryInsert(false);
+        $user->tryInsert();
 
         return [
-            'refreshed' => $refreshed
+            'refreshed' => $refreshed,
+            'token' => $user->token,
         ];
     }
 
@@ -118,19 +120,26 @@ class AuthService
         ];
     }
 
-    public function loginAsGuest(?int $userId)
+    public function loginByToken(string $token)
     {
-        if ($userId === null) {
-            $user = new User();
-            $user->save();
-            $userId = $user->id;
+        $decoded = $this->checkToken($token);
+        $userId = $decoded->user_id;
+        $user = User::findOrFail($userId);
+        if (property_exists($decoded, 'exp')) {
+            $user->saveToken();
         }
-        else {
-            $user = User::findOrFail($userId);
-        }
+        return [
+            'id' => $userId,
+            'token' => $user->token,
+        ];
+    }
 
-        $token = $user->saveToken();
-
+    public function loginAsGuest()
+    {
+        $user = new User();
+        $user->save();
+        $userId = $user->id;
+        $token = $user->saveToken(false);
         return [
             'id' => $userId,
             'token' => $token

@@ -48,6 +48,19 @@ Content-Type: application/json
 ###
 
 POST http://localhost:5000/rpc?XDEBUG_SESSION_START=17185
+Authorization: Bearer Debug-User-Id:2
+Content-Type: application/json
+
+{
+  "method": "loginByToken",
+  "params": {
+    "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoyMywiZXhwIjoxNTU3OTM2MjM5fQ.CQl-I-i6H5FULTnEXhLPxP420ECMWEfese45k_4czzU"
+  }
+}
+
+###
+
+POST http://localhost:5000/rpc?XDEBUG_SESSION_START=17185
 Content-Type: application/json
 
 {
@@ -78,7 +91,7 @@ Content-Type: application/json
 {
   "method": "bindPassword",
   "params": {
-    "id": 15,
+    "id": 24,
     "username": "big bang",
     "password": "45678"
   }
