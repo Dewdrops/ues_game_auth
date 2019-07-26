@@ -45,12 +45,16 @@ class AuthService
         ];
     }
 
-    public function bindWechat(int $id, string $code, bool $allowRefresh)
+    public function bindWechat(int $id, string $appName, string $code, bool $allowRefresh)
     {
-        $user = User::findOrFail($id, ['id', 'wx_openid']);
+        $user = User::findOrFail($id, ['id']);
+
+        $wechat = app(WechatService::class);
+        $sessionInfo = $wechat->session($code);
+        $openid = $sessionInfo['openid'];
 
         $refreshed = false;
-        if ($user->wx_openid) {
+        if ($user->wxCredExisted()) {
             if ($allowRefresh) {
                 $refreshed = true;
             }
@@ -59,12 +63,7 @@ class AuthService
             }
         }
 
-        $wechat = app(WechatService::class);
-        $sessionInfo = $wechat->session($code);
-        $user->wx_session_key = $sessionInfo['session_key'];
-        $user->wx_openid = $sessionInfo['openid'];
-
-        $user->tryInsert();
+        $user->saveWxCredentials($appName, $openid);
 
         return [
             'refreshed' => $refreshed,
@@ -112,7 +111,7 @@ class AuthService
             throw new AuthException("Password wrong for user[$username]", AuthException::CODE_PASSWORD_WRONG);
         }
 
-        $token = $user->saveToken();
+        $token = $this->calcToken($user->id);
 
         return [
             'id' => $user->id,
@@ -124,13 +123,12 @@ class AuthService
     {
         $decoded = $this->checkToken($token);
         $userId = $decoded->user_id;
-        $user = User::findOrFail($userId);
-        if (property_exists($decoded, 'exp')) {
-            $user->saveToken();
+        if (!User::find($userId, ['id'])) {
+            throw new AuthException("Invalide token [$token]", AuthException::CODE_INVALID_TOKEN);
         }
         return [
             'id' => $userId,
-            'token' => $user->token,
+            'token' => $this->calcToken($userId),
         ];
     }
 
@@ -138,36 +136,30 @@ class AuthService
     {
         $user = new User();
         $user->save();
-        $userId = $user->id;
-        $token = $user->saveToken(false);
+        $token = $this->calcToken($user->id, false);
         return [
-            'id' => $userId,
+            'id' => $user->id,
             'token' => $token
         ];
     }
 
-    public function loginByWechat(string $code, $iv = null, $encrypted = null): array
+    public function loginByWechat(string $appName, string $code, $iv = null, $encrypted = null): array
     {
         $wechat = app(WechatService::class);
         $sessionInfo = $wechat->session($code);
-        $sessionKey = $sessionInfo['session_key'];
         $openid = $sessionInfo['openid'];
-        $user = User::where(['wx_openid' => $openid])
-            ->select(['id'])
-            ->first();
+        $user = User::byWxOpenid($appName, $openid, ['id']);
         if ($user) {
             $existed = true;
-            $user->wx_session_key = $sessionKey;
         }
         else {
             $existed = false;
             $user = new User();
-            $user->wx_session_key = $sessionKey;
-            $user->wx_openid = $openid;
+            $user->save();
+            $user->saveWxCredentials($appName, $openid);
         }
-        $user->save();
 
-        $token = $user->saveToken();
+        $token = $this->calcToken($user->id);
 
         $ret = [
             'id' => $user->id,
@@ -179,6 +171,20 @@ class AuthService
         }
 
         return $ret;
+    }
+
+    private function calcToken(int $userId, bool $willExpire = true): string
+    {
+        $payload = [
+            'user_id' => $userId,
+        ];
+        if ($willExpire) {
+            $payload['exp'] = time() + config('app.jwt.expiry_period');
+        }
+        $jwtSecret = config('app.jwt.jwt_secret');
+        $jwtAlg = config('app.jwt.jwt_alg');
+
+        return JWT::encode($payload, $jwtSecret, $jwtAlg);
     }
 
 }

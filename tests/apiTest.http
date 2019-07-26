@@ -91,7 +91,7 @@ Content-Type: application/json
 {
   "method": "bindPassword",
   "params": {
-    "id": 24,
+    "id": 1,
     "username": "big bang",
     "password": "45678"
   }

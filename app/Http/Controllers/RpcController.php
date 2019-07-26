@@ -25,6 +25,7 @@ class RpcController extends Controller
     public function loginByWechat(AuthService $service, RpcParams $params)
     {
         return $service->loginByWechat(
+            $params['app_name'],
             $params['code'],
             $params->get('iv'),
             $params->get('encrypted')
@@ -54,7 +55,7 @@ class RpcController extends Controller
     public function bindWechat(AuthService $service, RpcParams $params)
     {
         return $service->bindWechat(
-            $params['id'], $params['code'], $params->get("allowRefresh", false)
+            $params['id'], $params['app_name'], $params['code'], $params->get("allowRefresh", false)
         );
     }
 
