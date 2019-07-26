@@ -13,15 +13,14 @@ use App\Exceptions\AuthException;
 use EasyWeChat\Factory;
 use Illuminate\Support\Facades\Log;
 
-class WechatService
+class WechatHelper
 {
 
     private $app;
 
-    function __construct()
+    function __construct($appName)
     {
-        $key = 'app.wechat.' . config('app.name');
-        $this->app = Factory::miniProgram(config($key));
+        $this->app = Factory::miniProgram(config('app.wechat.' . $appName));
     }
 
     function session(string $code)

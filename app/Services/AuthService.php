@@ -49,7 +49,7 @@ class AuthService
     {
         $user = User::findOrFail($id, ['id']);
 
-        $wechat = app(WechatService::class);
+        $wechat = new WechatHelper($appName);
         $sessionInfo = $wechat->session($code);
         $openid = $sessionInfo['openid'];
 
@@ -145,7 +145,7 @@ class AuthService
 
     public function loginByWechat(string $appName, string $code, $iv = null, $encrypted = null): array
     {
-        $wechat = app(WechatService::class);
+        $wechat = new WechatHelper($appName);
         $sessionInfo = $wechat->session($code);
         $openid = $sessionInfo['openid'];
         $user = User::byWxOpenid($appName, $openid, ['id']);
