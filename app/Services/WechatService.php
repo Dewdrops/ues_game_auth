@@ -20,7 +20,8 @@ class WechatService
 
     function __construct()
     {
-        $this->app = Factory::miniProgram(config('app.wechat'));
+        $key = 'app.wechat.' . config('app.name');
+        $this->app = Factory::miniProgram(config($key));
     }
 
     function session(string $code)

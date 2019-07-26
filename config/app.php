@@ -10,12 +10,32 @@ return [
 
     // EasyWechat configuration
     'wechat' => [
-        'app_id' => env('WECHAT_APP_ID'),
-        'secret' => env('WECHAT_APP_SECRET'),
-        'response_type' => 'array',
-        'log' => [
-            'level' => env('WECHAT_LOG_LEVEL', 'DEBUG'),
-            'file' => storage_path('logs/wechat.log'),
+        'pan' => [
+            'app_id' => env('PAN_WECHAT_APP_ID'),
+            'secret' => env('PAN_WECHAT_APP_SECRET'),
+            'response_type' => 'array',
+            'log' => [
+                'level' => 'DEBUG',
+                'file' => storage_path('logs/wechat.log'),
+            ],
+        ],
+        'card' => [
+            'app_id' => env('CARD_WECHAT_APP_ID'),
+            'secret' => env('CARD_WECHAT_APP_SECRET'),
+            'response_type' => 'array',
+            'log' => [
+                'level' => 'DEBUG',
+                'file' => storage_path('logs/wechat.log'),
+            ],
+        ],
+        'pipo' => [
+            'app_id' => env('PIPO_WECHAT_APP_ID'),
+            'secret' => env('PIPO_WECHAT_APP_SECRET'),
+            'response_type' => 'array',
+            'log' => [
+                'level' => 'DEBUG',
+                'file' => storage_path('logs/wechat.log'),
+            ],
         ],
     ],
 
