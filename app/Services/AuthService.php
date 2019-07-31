@@ -41,7 +41,7 @@ class AuthService
 
         return [
             'id' => $user->id,
-            'token' => $user->token
+            'token' => $this->calcToken($user->id),
         ];
     }
 
@@ -67,7 +67,7 @@ class AuthService
 
         return [
             'refreshed' => $refreshed,
-            'token' => $user->token,
+            'token' => $this->calcToken($user->id),
         ];
     }
 
@@ -91,7 +91,7 @@ class AuthService
 
         return [
             'refreshed' => $refreshed,
-            'token' => $user->token,
+            'token' => $this->calcToken($user->id),
         ];
     }
 
