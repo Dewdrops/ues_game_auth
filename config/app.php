@@ -37,6 +37,15 @@ return [
                 'file' => storage_path('logs/wechat.log'),
             ],
         ],
+        'sea' => [
+            'app_id' => env('SEA_WECHAT_APP_ID'),
+            'secret' => env('SEA_WECHAT_APP_SECRET'),
+            'response_type' => 'array',
+            'log' => [
+                'level' => 'DEBUG',
+                'file' => storage_path('logs/wechat.log'),
+            ],
+        ],
     ],
 
     'jwt' => [
