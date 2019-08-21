@@ -143,6 +143,33 @@ class AuthService
         ];
     }
 
+    public function loginByTtgame(string $appName, string $code): array
+    {
+        $ttHelper = new TtHelper($appName);
+        $sessionInfo = $ttHelper->session($code);
+        $openid = $sessionInfo['openid'];
+        $user = User::byWxOpenid($appName, $openid, ['id']);
+        if ($user) {
+            $existed = true;
+        }
+        else {
+            $existed = false;
+            $user = new User();
+            $user->save();
+            $user->saveWxCredentials($appName, $openid);
+        }
+
+        $token = $this->calcToken($user->id);
+
+        $ret = [
+            'id' => $user->id,
+            'token' => $token,
+            'existed' => $existed,
+        ];
+
+        return $ret;
+    }
+
     public function loginByWechat(string $appName, string $code, $iv = null, $encrypted = null): array
     {
         $wechat = new WechatHelper($appName);

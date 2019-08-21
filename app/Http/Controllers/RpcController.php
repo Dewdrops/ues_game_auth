@@ -32,6 +32,14 @@ class RpcController extends Controller
         );
     }
 
+    public function loginByTtgame(AuthService $service, RpcParams $params)
+    {
+        return $service->loginByTtgame(
+            $params['app_name'],
+            $params['code']
+        );
+    }
+
     public function loginByPassword(AuthService $service, RpcParams $params)
     {
         return $service->loginByPassword($params['username'], $params['password']);

@@ -8,6 +8,25 @@
 
 return [
 
+    'ttgame' => [
+        'pan_tt' => [
+            'app_id' => env('PAN_TTGAME_APP_ID'),
+            'secret' => env('PAN_TTGAME_APP_SECRET'),
+        ],
+        'card_tt' => [
+            'app_id' => env('CARD_TTGAME_APP_ID'),
+            'secret' => env('CARD_TTGAME_APP_SECRET'),
+        ],
+        'pipo_tt' => [
+            'app_id' => env('PIPO_TTGAME_APP_ID'),
+            'secret' => env('PIPO_TTGAME_APP_SECRET'),
+        ],
+        'sea_tt' => [
+            'app_id' => env('SEA_TTGAME_APP_ID'),
+            'secret' => env('SEA_TTGAME_APP_SECRET'),
+        ],
+    ],
+
     // EasyWechat configuration
     'wechat' => [
         'pan' => [
