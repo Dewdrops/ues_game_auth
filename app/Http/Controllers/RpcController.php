@@ -17,6 +17,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Laravel\Lumen\Routing\Controller;
 
 class RpcController extends Controller
@@ -60,6 +61,11 @@ class RpcController extends Controller
         return $service->register($params['username'], $params['password']);
     }
 
+    public function getOpenid(AuthService $service, RpcParams $params)
+    {
+        return $service->getOpenid($params['id'], $params['app_name']);
+    }
+
     public function bindWechat(AuthService $service, RpcParams $params)
     {
         return $service->bindWechat(
@@ -88,15 +94,15 @@ class RpcController extends Controller
         try {
             $result = $this->execute($endpoint, $params);
             $wrapped = [
-                'result' => $result ?? (object) null,
+                'result' => $result,
             ];
         }
-        catch (\Exception $exception) {
-            Log::error("{$exception->getMessage()}, stack: {$exception->getTraceAsString()}");
+        catch (\Throwable $throwable) {
+            Log::error("{$throwable->getMessage()}, stack: {$throwable->getTraceAsString()}");
             $wrapped = [
                 'error' => [
-                    'code' => $exception->getCode() ?: AuthException::CODE_AUTH_FAILED,
-                    'message' => $exception->getMessage(),
+                    'code' => $throwable->getCode() ?: AuthException::CODE_AUTH_FAILED,
+                    'message' => $throwable->getMessage(),
                 ]
             ];
         }
@@ -132,7 +138,7 @@ class RpcController extends Controller
     private function executeSingle($endpoint, $inputParams)
     {
         $class = new \ReflectionClass(static::class);
-        $methodName = camel_case($endpoint);
+        $methodName = Str::camel($endpoint);
         $method = $class->getMethod($methodName);
 
         $args = [];

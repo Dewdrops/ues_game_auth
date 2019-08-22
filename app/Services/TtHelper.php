@@ -40,7 +40,7 @@ class TtHelper
         );
         $ret = json_decode($resp->getBody()->getContents(), true);
 
-        if (Arr::has($ret, 'errcode')) {
+        if (Arr::has($ret, 'errcode') && $ret['errcode'] !== 0) {
             throw new AuthException(
                 "Error in Ttgame code2session call: [{$ret['errmsg']}]",
                 AuthException::CODE_AUTH_FAILED

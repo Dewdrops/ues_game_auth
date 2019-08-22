@@ -214,4 +214,11 @@ class AuthService
         return JWT::encode($payload, $jwtSecret, $jwtAlg);
     }
 
+    public function getOpenid(int $userId, string $appName): ?string
+    {
+        $user = User::findOrFail($userId, ['id']);
+
+        return $user->getOpenid($appName);
+    }
+
 }

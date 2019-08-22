@@ -59,6 +59,20 @@ class User extends BaseModel implements AuthenticatableContract, AuthorizableCon
         }
     }
 
+    public function getOpenid(string $appName)
+    {
+        $row = DB::table(self::WX_CRED_TABLE)
+            ->where(['app_name' => $appName, 'user_id' => $this->id])
+            ->select(['wx_openid'])
+            ->first();
+        if ($row) {
+            return $row->wx_openid;
+        }
+        else {
+            return null;
+        }
+    }
+
     public function saveWxCredentials(string $appName, string $wxOpenid)
     {
         $attrs = [
