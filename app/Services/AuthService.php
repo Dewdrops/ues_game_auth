@@ -200,6 +200,22 @@ class AuthService
         return $ret;
     }
 
+    public function ttGetBalance(int $id, string $appName)
+    {
+        $tt = new TtHelper($appName);
+        $user = User::findOrFail($id);
+
+        return $tt->getBalance($user);
+    }
+
+    public function ttGamePay(int $id, string $appName, int $amount, ?string $billNo)
+    {
+        $tt = new TtHelper($appName);
+        $user = User::findOrFail($id);
+
+        return $tt->gamePay($user, $amount, $billNo);
+    }
+
     private function calcToken(int $userId, bool $willExpire = true): string
     {
         $payload = [

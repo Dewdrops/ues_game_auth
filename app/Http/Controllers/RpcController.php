@@ -80,6 +80,16 @@ class RpcController extends Controller
         );
     }
 
+    public function ttGetBalance(AuthService $service, RpcParams $params)
+    {
+        return $service->ttGetBalance($params['id'], $params['app_name']);
+    }
+
+    public function ttGamePay(AuthService $service, RpcParams $params)
+    {
+        return $service->ttGamePay($params['id'], $params['app_name'], $params['amount'], $params['bill_no']);
+    }
+
     public function checkToken(AuthService $service, RpcParams $params)
     {
         return $service->checkToken($params['token']);
@@ -148,9 +158,9 @@ class RpcController extends Controller
                 if ($paramClass->name === RpcParams::class) {
                     $args[] = new RpcParams($inputParams);
                 }
-                elseif ($paramClass->name === User::class) {
-                    $args[] = Auth::user();
-                }
+//                elseif ($paramClass->name === User::class) {
+//                    $args[] = Auth::user();
+//                }
                 else {
                     $args[] = app($paramClass->name);
                 }
