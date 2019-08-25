@@ -96,6 +96,15 @@ class TtHelper
             $billNo = Str::uuid()->toString();
         }
 
+        $record = [
+            'user_id' => $user->id,
+            'app_name' => $this->appName,
+            'type' => 'GAME_PAY',
+            'amount' => $amount,
+            'bill_no' => $billNo,
+            'processed' => false,
+        ];
+
         $params = [
             'access_token' => $this->getAccessToken(),
             'appid' => $this->config['app_id'],
@@ -106,12 +115,7 @@ class TtHelper
             'amt' => $amount,
             'bill_no' => $billNo,
         ];
-        $params['mp_sig'] = $this->generateSig(
-            $params,
-            'POST',
-            '/api/apps/game/wallet/game_pay'
-        );
-
+        $params['mp_sig'] = $this->generateSig($params, 'POST','/api/apps/game/wallet/game_pay');
         $resp = $this->client->request(
             'POST',
             'https://developer.toutiao.com/api/apps/game/wallet/game_pay',
@@ -124,22 +128,17 @@ class TtHelper
         Log::info('Call toutiao game_pay', ['ret' => $ret]);
 
         if (Arr::has($ret, 'errcode') && $ret['errcode'] !== 0) {
-            DB::table(self::PAY_RECORD_TABLE)
-                ->insert([
-                    'user_id' => $user->id,
-                    'app_name' => $this->appName,
-                    'type' => 'GAME_PAY',
-                    'amount' => $amount,
-                    'bill_no' => $billNo,
-                    'processed' => false,
-                    'extend_info' => json_encode([
-                        'errcode' => $ret['errcode'],
-                        'errmsg' => $ret['errmsg'],
-                    ])
+            $record['extend_info'] = json_encode([
+                'errcode' => $ret['errcode'],
+                'errmsg' => $ret['errmsg'],
             ]);
+            DB::table(self::PAY_RECORD_TABLE)->insert($record);
 
             throw new \Exception("Error in Ttgame get_balance call: [{$ret['errmsg']}]" );
         }
+
+        $record['processed'] = true;
+        DB::table(self::PAY_RECORD_TABLE)->insert($record);
 
         return [
             'bill_no' => $ret['bill_no'],
