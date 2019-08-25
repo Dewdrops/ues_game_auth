@@ -100,7 +100,6 @@ Content-Type: application/json
 ###
 
 POST http://localhost:5000/rpc?XDEBUG_SESSION_START=19763
-Authorization: Bearer Debug-User-Id:1
 Content-Type: application/json
 
 {

@@ -12,6 +12,7 @@ return [
         'pan_tt' => [
             'app_id' => env('PAN_TTGAME_APP_ID'),
             'secret' => env('PAN_TTGAME_APP_SECRET'),
+            'pay_secret' => env('PAN_TTGAME_PAY_SECRET'),
         ],
         'card_tt' => [
             'app_id' => env('CARD_TTGAME_APP_ID'),

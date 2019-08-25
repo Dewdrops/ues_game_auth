@@ -86,14 +86,14 @@ class TtHelper
         $stringA = http_build_query($params);
         $stringB = $stringA . "&org_loc={$requestUri}&method={$httpMethod}";
 
-        return hash_hmac( "sha256", $stringB, config('app.ttgame.pay_secret'));
+        return hash_hmac( "sha256", $stringB, $this->config['pay_secret']);
     }
 
     //https://developer.toutiao.com/docs/game/payment/pay.html
     public function gamePay(User $user, int $amount, ?string $billNo)
     {
         if ($billNo === null) {
-            $billNo = Str::uuid();
+            $billNo = Str::uuid()->toString();
         }
 
         $params = [
@@ -112,16 +112,6 @@ class TtHelper
             '/api/apps/game/wallet/game_pay'
         );
 
-        DB::table(self::PAY_RECORD_TABLE)
-            ->insert([
-                'user_id' => $user->id,
-                'app_name' => $this->appName,
-                'type' => 'GAME_PAY',
-                'amount' => $amount,
-                'bill_no' => $billNo,
-                'processed' => false,
-            ]);
-
         $resp = $this->client->request(
             'POST',
             'https://developer.toutiao.com/api/apps/game/wallet/game_pay',
@@ -134,14 +124,22 @@ class TtHelper
         Log::info('Call toutiao game_pay', ['ret' => $ret]);
 
         if (Arr::has($ret, 'errcode') && $ret['errcode'] !== 0) {
+            DB::table(self::PAY_RECORD_TABLE)
+                ->insert([
+                    'user_id' => $user->id,
+                    'app_name' => $this->appName,
+                    'type' => 'GAME_PAY',
+                    'amount' => $amount,
+                    'bill_no' => $billNo,
+                    'processed' => false,
+                    'extend_info' => json_encode([
+                        'errcode' => $ret['errcode'],
+                        'errmsg' => $ret['errmsg'],
+                    ])
+            ]);
+
             throw new \Exception("Error in Ttgame get_balance call: [{$ret['errmsg']}]" );
         }
-
-        DB::table(self::PAY_RECORD_TABLE)
-            ->where('bill_no', '=', $billNo)
-            ->update([
-                'processed' => true
-            ]);
 
         return [
             'bill_no' => $ret['bill_no'],
