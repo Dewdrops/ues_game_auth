@@ -17,6 +17,7 @@ return [
         'card_tt' => [
             'app_id' => env('CARD_TTGAME_APP_ID'),
             'secret' => env('CARD_TTGAME_APP_SECRET'),
+            'pay_secret' => env('CARD_TTGAME_PAY_SECRET'),
         ],
         'pipo_tt' => [
             'app_id' => env('PIPO_TTGAME_APP_ID'),
