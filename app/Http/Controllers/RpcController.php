@@ -10,7 +10,9 @@ namespace App\Http\Controllers;
 
 
 use App\Exceptions\AuthException;
+use App\Exceptions\GamePayException;
 use App\Services\AuthService;
+use App\Services\GamePayService;
 use App\Support\RpcParams;
 use App\User;
 use Illuminate\Http\Request;
@@ -80,14 +82,14 @@ class RpcController extends Controller
         );
     }
 
-    public function ttGetBalance(AuthService $service, RpcParams $params)
+    public function getBalance(GamePayService $service, RpcParams $params)
     {
-        return $service->ttGetBalance($params['id'], $params['app_name']);
+        return $service->getBalance($params['id'], $params['app_name']);
     }
 
-    public function ttGamePay(AuthService $service, RpcParams $params)
+    public function gamePay(GamePayService $service, RpcParams $params)
     {
-        return $service->ttGamePay($params['id'], $params['app_name'], $params['amount'], $params['bill_no']);
+        return $service->gamePay($params['id'], $params['app_name'], $params['amount'], $params['bill_no']);
     }
 
     public function checkToken(AuthService $service, RpcParams $params)

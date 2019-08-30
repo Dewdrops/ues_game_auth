@@ -10,14 +10,14 @@ namespace App\Services;
 
 
 use App\Exceptions\AuthException;
+use App\Exceptions\GamePayException;
 use App\User;
 use GuzzleHttp\Client;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
-class TtHelper
+class TtHelper implements GamePayDriver
 {
 
     private $client;
@@ -74,7 +74,7 @@ class TtHelper
         $ret = json_decode($resp->getBody()->getContents(), true);
 
         if (Arr::has($ret, 'errcode') && $ret['errcode'] !== 0) {
-            throw new \Exception("Error in Ttgame get accesss token call: [{$ret['errmsg']}]" );
+            throw new AuthException("Error in Ttgame get accesss token call: [{$ret['errmsg']}]", AuthException::CODE_AUTH_FAILED);
         }
         return $ret['access_token'];
     }
@@ -90,20 +90,11 @@ class TtHelper
     }
 
     //https://developer.toutiao.com/docs/game/payment/pay.html
-    public function gamePay(User $user, int $amount, ?string $billNo)
+    public function gamePay(User $user, int $amount, string $billNo)
     {
         if ($billNo === null) {
             $billNo = Str::uuid()->toString();
         }
-
-        $record = [
-            'user_id' => $user->id,
-            'app_name' => $this->appName,
-            'type' => 'GAME_PAY',
-            'amount' => $amount,
-            'bill_no' => $billNo,
-            'processed' => false,
-        ];
 
         $params = [
             'access_token' => $this->getAccessToken(),
@@ -128,17 +119,8 @@ class TtHelper
         Log::info('Call toutiao game_pay', ['ret' => $ret]);
 
         if (Arr::has($ret, 'errcode') && $ret['errcode'] !== 0) {
-            $record['extend_info'] = json_encode([
-                'errcode' => $ret['errcode'],
-                'errmsg' => $ret['errmsg'],
-            ]);
-            DB::table(self::PAY_RECORD_TABLE)->insert($record);
-
-            throw new \Exception("Error in Ttgame get_balance call: [{$ret['errmsg']}]" );
+            throw new GamePayException("Error in Ttgame gamepay call: code[{$ret['errcode']}], msg[{$ret['errmsg']}]", GamePayException::CODE_PAY_FAILURE );
         }
-
-        $record['processed'] = true;
-        DB::table(self::PAY_RECORD_TABLE)->insert($record);
 
         return [
             'bill_no' => $ret['bill_no'],
@@ -175,21 +157,11 @@ class TtHelper
         Log::info('Call toutiao get_balance', ['ret' => $ret]);
 
         if (Arr::has($ret, 'errcode') && $ret['errcode'] !== 0) {
-            throw new \Exception("Error in Ttgame get_balance call: [{$ret['errmsg']}]" );
+            throw new \Exception("Error in Ttgame get_balance call: [{$ret['errmsg']}]");
         }
 
-        $balanceTt = $ret['balance'];
-        $payRemaining = DB::table(self::PAY_RECORD_TABLE)
-            ->where([
-                'user_id' => $user->id,
-                'app_name' => $this->appName,
-                'type' => 'GAME_PAY',
-                'processed' => true,
-            ])
-            ->sum('amount');
-
         return [
-            'balance' => $balanceTt - $payRemaining,
+            'balance' => $ret['balance'],
         ];
     }
 
