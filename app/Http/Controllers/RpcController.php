@@ -35,6 +35,14 @@ class RpcController extends Controller
         );
     }
 
+    public function loginByFacebook(AuthService $service, RpcParams $params)
+    {
+        return $service->loginByFacebook(
+            $params['app_name'],
+            $params['signature']
+        );
+    }
+
     public function loginByTtgame(AuthService $service, RpcParams $params)
     {
         return $service->loginByTtgame(

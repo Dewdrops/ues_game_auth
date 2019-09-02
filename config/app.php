@@ -8,6 +8,13 @@
 
 return [
 
+    'facebook' => [
+        'pan_fb' => [
+            'app_id' => env('PAN_FACEBOOK_APP_ID'),
+            'secret' => env('PAN_FACEBOOK_APP_SECRET'),
+        ],
+    ],
+
     'ttgame' => [
         'pan_tt' => [
             'app_id' => env('PAN_TTGAME_APP_ID'),

@@ -170,6 +170,43 @@ class AuthService
         return $ret;
     }
 
+    public function loginByFacebook(string $appName, string $signature): array
+    {
+        $exploded = explode('.', $signature);
+        $sig = base64_decode(str_replace(array('-', '_'), array('+', '/'), $exploded[0]));
+        $hash = hash_hmac('sha256', $exploded[1], config("app.facebook.{$appName}.secret"), true);
+        if ($hash !== $sig) {
+            throw new AuthException('Facebook signature invalid', AuthException::CODE_AUTH_FAILED);
+        }
+
+        $data = json_decode(base64_decode($exploded[1]), true);
+
+        $openid = $data['player_id'];
+        $user = User::byWxOpenid($appName, $openid, ['id']);
+        if ($user) {
+            $existed = true;
+        }
+        else {
+            $existed = false;
+            $user = new User();
+            $user->save();
+            $user->saveWxCredentials($appName, $openid);
+        }
+
+        $token = $this->calcToken($user->id);
+
+        $ret = [
+            'id' => $user->id,
+            'token' => $token,
+            'existed' => $existed,
+        ];
+        if (isset($decrypted)) {
+            $ret['decrypted'] = $decrypted;
+        }
+
+        return $ret;
+    }
+
     public function loginByWechat(string $appName, string $code, $iv = null, $encrypted = null): array
     {
         $wechat = new WechatHelper($appName);
