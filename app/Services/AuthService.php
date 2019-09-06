@@ -13,6 +13,7 @@ use App\Exceptions\AuthException;
 use App\User;
 use Firebase\JWT\ExpiredException;
 use Firebase\JWT\JWT;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Hash;
 
 class AuthService
@@ -137,7 +138,7 @@ class AuthService
     public function loginForDebug(int $userId)
     {
         if (!$this->checkDebugUserId($userId) || !User::find($userId, ['id'])) {
-            throw new AuthException("Invalide user id [$userId]", AuthException::CODE_AUTH_FAILED);
+            throw new AuthException("Invalid user id [$userId]", AuthException::CODE_AUTH_FAILED);
         }
         return [
             'id' => $userId,
@@ -273,7 +274,7 @@ class AuthService
 
     private function checkDebugUserId(int $id): bool
     {
-        return array_key_exists($id, self::VALID_DEBUG_USER_IDS);
+        return Arr::has(self::VALID_DEBUG_USER_IDS, $id);
     }
 
 }
