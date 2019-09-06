@@ -18,6 +18,8 @@ use Illuminate\Support\Facades\Hash;
 class AuthService
 {
 
+    const VALID_DEBUG_USER_IDS = [1, 2, 17, 18, 21, 999999];
+
     public function checkToken(string $token)
     {
         try {
@@ -125,6 +127,17 @@ class AuthService
         $userId = $decoded->user_id;
         if (!User::find($userId, ['id'])) {
             throw new AuthException("Invalide token [$token]", AuthException::CODE_INVALID_TOKEN);
+        }
+        return [
+            'id' => $userId,
+            'token' => $this->calcToken($userId),
+        ];
+    }
+
+    public function loginForDebug(int $userId)
+    {
+        if (!$this->checkDebugUserId($userId) || !User::find($userId, ['id'])) {
+            throw new AuthException("Invalide user id [$userId]", AuthException::CODE_AUTH_FAILED);
         }
         return [
             'id' => $userId,
@@ -256,6 +269,11 @@ class AuthService
         $user = User::findOrFail($userId, ['id']);
 
         return $user->getOpenid($appName);
+    }
+
+    private function checkDebugUserId(int $id): bool
+    {
+        return array_key_exists($id, self::VALID_DEBUG_USER_IDS);
     }
 
 }

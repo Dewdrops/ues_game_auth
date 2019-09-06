@@ -56,6 +56,11 @@ class RpcController extends Controller
         return $service->loginByPassword($params['username'], $params['password']);
     }
 
+    public function loginForDebug(AuthService $service, RpcParams $params)
+    {
+        return $service->loginForDebug($params['user_id']);
+    }
+
     public function loginByToken(AuthService $service, RpcParams $params)
     {
         return $service->loginByToken($params['token']);
