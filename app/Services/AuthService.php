@@ -274,7 +274,7 @@ class AuthService
 
     private function checkDebugUserId(int $id): bool
     {
-        return Arr::has(self::VALID_DEBUG_USER_IDS, $id);
+        return in_array($id, self::VALID_DEBUG_USER_IDS, true);
     }
 
 }
