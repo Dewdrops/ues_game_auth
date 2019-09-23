@@ -15,6 +15,7 @@ use Firebase\JWT\ExpiredException;
 use Firebase\JWT\JWT;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class AuthService
 {
@@ -48,21 +49,31 @@ class AuthService
         ];
     }
 
+    private function getPlatformDriver(string $appName)
+    {
+        if (Str::endsWith(Str::lower($appName), '_tt')) {
+            return new TtHelper($appName);
+        }
+        else {
+            return new WechatHelper($appName);
+        }
+    }
+
     public function bindWechat(int $id, string $appName, string $code, bool $allowRefresh)
     {
         $user = User::findOrFail($id, ['id']);
 
-        $wechat = new WechatHelper($appName);
-        $sessionInfo = $wechat->session($code);
+        $driver = $this->getPlatformDriver($appName);
+        $sessionInfo = $driver->session($code);
         $openid = $sessionInfo['openid'];
 
         $refreshed = false;
-        if ($user->wxCredExisted()) {
+        if ($user->wxCredExisted($appName)) {
             if ($allowRefresh) {
                 $refreshed = true;
             }
             else {
-                throw new AuthException("Wechat has bound", AuthException::CODE_DUPLICATE_BIND);
+                throw new AuthException("App[$appName] has bound for user[$id]", AuthException::CODE_DUPLICATE_BIND);
             }
         }
 
@@ -159,29 +170,7 @@ class AuthService
 
     public function loginByTtgame(string $appName, string $code): array
     {
-        $ttHelper = new TtHelper($appName);
-        $sessionInfo = $ttHelper->session($code);
-        $openid = $sessionInfo['openid'];
-        $user = User::byWxOpenid($appName, $openid, ['id']);
-        if ($user) {
-            $existed = true;
-        }
-        else {
-            $existed = false;
-            $user = new User();
-            $user->save();
-            $user->saveWxCredentials($appName, $openid);
-        }
-
-        $token = $this->calcToken($user->id);
-
-        $ret = [
-            'id' => $user->id,
-            'token' => $token,
-            'existed' => $existed,
-        ];
-
-        return $ret;
+        return $this->loginByWechat($appName, $code);
     }
 
     public function loginByFacebook(string $appName, string $signature): array
@@ -223,8 +212,8 @@ class AuthService
 
     public function loginByWechat(string $appName, string $code, $iv = null, $encrypted = null): array
     {
-        $wechat = new WechatHelper($appName);
-        $sessionInfo = $wechat->session($code);
+        $driver = $this->getPlatformDriver($appName);
+        $sessionInfo = $driver->session($code);
         $openid = $sessionInfo['openid'];
         $user = User::byWxOpenid($appName, $openid, ['id']);
         if ($user) {

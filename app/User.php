@@ -96,9 +96,11 @@ class User extends BaseModel implements AuthenticatableContract, AuthorizableCon
         }
     }
 
-    public function wxCredExisted(): bool
+    public function wxCredExisted(string $appName): bool
     {
-        return DB::table(self::WX_CRED_TABLE)->where(['user_id' => $this->id])->count() > 0;
+        return DB::table(self::WX_CRED_TABLE)
+                ->where(['user_id' => $this->id, 'app_name' => $appName])
+                ->count() > 0;
     }
 
 }
