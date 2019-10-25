@@ -196,7 +196,10 @@ class AuthService
             $user->saveWxCredentials($appName, $openid);
         }
 
-        $token = $this->calcToken(['user_id' => $user->id]);
+        $token = $this->calcToken([
+            'user_id' => $user->id,
+            'app' => $appName,
+        ]);
 
         $ret = [
             'id' => $user->id,
