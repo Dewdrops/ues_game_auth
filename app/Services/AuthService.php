@@ -13,14 +13,11 @@ use App\Exceptions\AuthException;
 use App\User;
 use Firebase\JWT\ExpiredException;
 use Firebase\JWT\JWT;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 class AuthService
 {
-
-    const VALID_DEBUG_USER_IDS = [1, 2, 17, 18, 21, 999999];
 
     public function checkToken(string $token)
     {
@@ -45,7 +42,7 @@ class AuthService
 
         return [
             'id' => $user->id,
-            'token' => $this->calcToken($user->id),
+            'token' => $this->calcToken(['user_id' => $user->id]),
         ];
     }
 
@@ -81,7 +78,10 @@ class AuthService
 
         return [
             'refreshed' => $refreshed,
-            'token' => $this->calcToken($user->id),
+            'token' => $this->calcToken([
+                'user_id' => $user->id,
+                'app' => $appName
+            ]),
         ];
     }
 
@@ -105,7 +105,7 @@ class AuthService
 
         return [
             'refreshed' => $refreshed,
-            'token' => $this->calcToken($user->id),
+            'token' => $this->calcToken(['user_id' => $user->id]),
         ];
     }
 
@@ -125,7 +125,7 @@ class AuthService
             throw new AuthException("Password wrong for user[$username]", AuthException::CODE_PASSWORD_WRONG);
         }
 
-        $token = $this->calcToken($user->id);
+        $token = $this->calcToken(['user_id' => $user->id]);
 
         return [
             'id' => $user->id,
@@ -142,7 +142,7 @@ class AuthService
         }
         return [
             'id' => $userId,
-            'token' => $this->calcToken($userId),
+            'token' => $this->calcToken(['user_id' => $userId]),
         ];
     }
 
@@ -153,7 +153,7 @@ class AuthService
         }
         return [
             'id' => $userId,
-            'token' => $this->calcToken($userId),
+            'token' => $this->calcToken(['user_id' => $userId]),
         ];
     }
 
@@ -163,7 +163,7 @@ class AuthService
         $user->save();
         $token = $this->calcToken($user->id, false);
         return [
-            'id' => $user->id,
+            'id' => ['user_id' => $user->id],
             'token' => $token
         ];
     }
@@ -196,7 +196,7 @@ class AuthService
             $user->saveWxCredentials($appName, $openid);
         }
 
-        $token = $this->calcToken($user->id);
+        $token = $this->calcToken(['user_id' => $user->id]);
 
         $ret = [
             'id' => $user->id,
@@ -226,7 +226,7 @@ class AuthService
             $user->saveWxCredentials($appName, $openid);
         }
 
-        $token = $this->calcToken($user->id);
+        $token = $this->calcToken(['user_id' => $user->id]);
 
         $ret = [
             'id' => $user->id,
@@ -240,11 +240,8 @@ class AuthService
         return $ret;
     }
 
-    private function calcToken(int $userId, bool $willExpire = true): string
+    private function calcToken(array $payload, bool $willExpire = true): string
     {
-        $payload = [
-            'user_id' => $userId,
-        ];
         if ($willExpire) {
             $payload['exp'] = time() + config('app.jwt.expiry_period');
         }
@@ -263,7 +260,8 @@ class AuthService
 
     private function checkDebugUserId(int $id): bool
     {
-        return in_array($id, self::VALID_DEBUG_USER_IDS, true);
+        $validDebugIds = explode(',', config('app.debug.valid_user_ids'));
+        return in_array($id, $validDebugIds);
     }
 
 }

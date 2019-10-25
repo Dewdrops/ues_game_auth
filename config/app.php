@@ -86,4 +86,9 @@ return [
         'user_table' => env('USER_TABLE')
     ],
 
+    'debug' => [
+        'sql_slow_threshold' => env('SQL_SLOW_THRESHOLD'),
+        'valid_user_ids' => env('VALID_DEBUG_USER_IDS'),
+    ],
+
 ];
