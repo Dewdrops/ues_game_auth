@@ -32,7 +32,7 @@ class AuthService
         }
     }
 
-    public function register(string $username, string $password): array
+    public function register(string $app, string $username, string $password): array
     {
         $user = new User();
         $user->password = Hash::make($password);
@@ -42,50 +42,53 @@ class AuthService
 
         return [
             'id' => $user->id,
-            'token' => $this->calcToken(['user_id' => $user->id]),
-        ];
-    }
-
-    private function getPlatformDriver(string $appName)
-    {
-        if (Str::endsWith(Str::lower($appName), '_tt')) {
-            return new TtHelper($appName);
-        }
-        else {
-            return new WechatHelper($appName);
-        }
-    }
-
-    public function bindWechat(int $id, string $appName, string $code, bool $allowRefresh)
-    {
-        $user = User::findOrFail($id, ['id']);
-
-        $driver = $this->getPlatformDriver($appName);
-        $sessionInfo = $driver->session($code);
-        $openid = $sessionInfo['openid'];
-
-        $refreshed = false;
-        if ($user->wxCredExisted($appName)) {
-            if ($allowRefresh) {
-                $refreshed = true;
-            }
-            else {
-                throw new AuthException("App[$appName] has bound for user[$id]", AuthException::CODE_DUPLICATE_BIND);
-            }
-        }
-
-        $user->saveWxCredentials($appName, $openid);
-
-        return [
-            'refreshed' => $refreshed,
-            'token' => $this->calcToken([
+            'token' => $this->generateToken([
                 'user_id' => $user->id,
-                'app' => $appName
+                'app' => $app
             ]),
         ];
     }
 
-    public function bindPassword(int $id, string $username, string $password, bool $allowRefresh)
+    private function getPlatformDriver(string $app)
+    {
+        if (Str::endsWith(Str::lower($app), '_tt')) {
+            return new TtHelper($app);
+        }
+        else {
+            return new WechatHelper($app);
+        }
+    }
+
+    public function bindWechat(int $id, string $app, string $code, bool $allowRefresh)
+    {
+        $user = User::findOrFail($id, ['id']);
+
+        $driver = $this->getPlatformDriver($app);
+        $sessionInfo = $driver->session($code);
+        $openid = $sessionInfo['openid'];
+
+        $refreshed = false;
+        if ($user->wxCredExisted($app)) {
+            if ($allowRefresh) {
+                $refreshed = true;
+            }
+            else {
+                throw new AuthException("App[$app] has bound for user[$id]", AuthException::CODE_DUPLICATE_BIND);
+            }
+        }
+
+        $user->saveWxCredentials($app, $openid);
+
+        return [
+            'refreshed' => $refreshed,
+            'token' => $this->generateToken([
+                'user_id' => $user->id,
+                'app' => $app
+            ]),
+        ];
+    }
+
+    public function bindPassword(int $id, string $app, string $username, string $password, bool $allowRefresh)
     {
         $user = User::findOrFail($id, ['id', 'username']);
 
@@ -105,11 +108,14 @@ class AuthService
 
         return [
             'refreshed' => $refreshed,
-            'token' => $this->calcToken(['user_id' => $user->id]),
+            'token' => $this->generateToken([
+                'user_id' => $user->id,
+                'app' => $app
+            ]),
         ];
     }
 
-    public function loginByPassword(string $username, string $password): array
+    public function loginByPassword(string $app, string $username, string $password): array
     {
         $user = User::where([
             'username' => $username,
@@ -125,15 +131,16 @@ class AuthService
             throw new AuthException("Password wrong for user[$username]", AuthException::CODE_PASSWORD_WRONG);
         }
 
-        $token = $this->calcToken(['user_id' => $user->id]);
-
         return [
             'id' => $user->id,
-            'token' => $token
+            'token' => $this->generateToken([
+                'user_id' => $user->id,
+                'app' => $app
+            ])
         ];
     }
 
-    public function loginByToken(string $token)
+    public function loginByToken(string $app, string $token)
     {
         $decoded = $this->checkToken($token);
         $userId = $decoded->user_id;
@@ -142,35 +149,41 @@ class AuthService
         }
         return [
             'id' => $userId,
-            'token' => $this->calcToken(['user_id' => $userId]),
+            'token' => $this->generateToken([
+                'user_id' => $userId,
+                'app' => $app
+            ]),
         ];
     }
 
-    public function loginForDebug(int $userId)
+    public function loginForDebug(string $app, int $userId)
     {
         if (!$this->checkDebugUserId($userId) || !User::find($userId, ['id'])) {
             throw new AuthException("Invalid user id [$userId]", AuthException::CODE_AUTH_FAILED);
         }
         return [
             'id' => $userId,
-            'token' => $this->calcToken(['user_id' => $userId]),
+            'token' => $this->generateToken([
+                'user_id' => $userId,
+                'app' => $app
+            ]),
         ];
     }
 
-    public function loginAsGuest()
+    public function loginAsGuest(string $app)
     {
         $user = new User();
         $user->save();
-        $token = $this->calcToken($user->id, false);
+        $token = $this->generateToken(['user_id' => $user->id, 'app' => $app], false);
         return [
             'id' => ['user_id' => $user->id],
             'token' => $token
         ];
     }
 
-    public function loginByTtgame(string $appName, string $code): array
+    public function loginByTtgame(string $app, string $code): array
     {
-        return $this->loginByWechat($appName, $code);
+        return $this->loginByWechat($app, $code);
     }
 
     public function loginByFacebook(string $appName, string $signature): array
@@ -196,7 +209,7 @@ class AuthService
             $user->saveWxCredentials($appName, $openid);
         }
 
-        $token = $this->calcToken([
+        $token = $this->generateToken([
             'user_id' => $user->id,
             'app' => $appName,
         ]);
@@ -213,12 +226,12 @@ class AuthService
         return $ret;
     }
 
-    public function loginByWechat(string $appName, string $code, $iv = null, $encrypted = null): array
+    public function loginByWechat(string $app, string $code, $iv = null, $encrypted = null): array
     {
-        $driver = $this->getPlatformDriver($appName);
+        $driver = $this->getPlatformDriver($app);
         $sessionInfo = $driver->session($code);
         $openid = $sessionInfo['openid'];
-        $user = User::byWxOpenid($appName, $openid, ['id']);
+        $user = User::byWxOpenid($app, $openid, ['id']);
         if ($user) {
             $existed = true;
         }
@@ -226,10 +239,10 @@ class AuthService
             $existed = false;
             $user = new User();
             $user->save();
-            $user->saveWxCredentials($appName, $openid);
+            $user->saveWxCredentials($app, $openid);
         }
 
-        $token = $this->calcToken(['user_id' => $user->id]);
+        $token = $this->generateToken(['user_id' => $user->id, 'app' => $app]);
 
         $ret = [
             'id' => $user->id,
@@ -243,7 +256,7 @@ class AuthService
         return $ret;
     }
 
-    private function calcToken(array $payload, bool $willExpire = true): string
+    private function generateToken(array $payload, bool $willExpire = true): string
     {
         if ($willExpire) {
             $payload['exp'] = time() + config('app.jwt.expiry_period');

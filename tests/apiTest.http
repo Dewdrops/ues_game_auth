@@ -13,6 +13,7 @@ Content-Type: application/json
 {
   "method": "loginByWechat",
   "params": {
+    "app_name": "auth",
     "code": "abcd"
   }
 }
@@ -26,6 +27,7 @@ Content-Type: application/json
 {
   "method": "register",
   "params": {
+    "app_name": "auth",
     "username": "good to go",
     "password": "123456"
   }
@@ -40,7 +42,8 @@ Content-Type: application/json
 {
   "method": "loginByPassword",
   "params": {
-    "username": "test name",
+    "app_name": "auth",
+    "username": "good to go",
     "password": "123456"
   }
 }
@@ -54,7 +57,8 @@ Content-Type: application/json
 {
   "method": "loginByToken",
   "params": {
-    "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoyMywiZXhwIjoxNTU3OTM2MjM5fQ.CQl-I-i6H5FULTnEXhLPxP420ECMWEfese45k_4czzU"
+    "app_name": "auth",
+    "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxNiwiYXBwIjoiYXV0aCIsImV4cCI6MTU3MjMxOTgwMn0._6qmLcf8mO2YICK7Ol8513zV-7uo8s7xZPZRl3qoUII"
   }
 }
 
@@ -66,6 +70,7 @@ Content-Type: application/json
 {
   "method": "loginAsGuest",
   "params": {
+    "app_name": "auth",
     "userId": 14
   }
 }
@@ -79,6 +84,7 @@ Content-Type: application/json
   "method": "bindWechat",
   "params": {
     "id": 3,
+    "app_name": "auth",
     "code": "123456"
   }
 }
@@ -92,6 +98,7 @@ Content-Type: application/json
   "method": "bindPassword",
   "params": {
     "id": 1,
+    "app_name": "auth",
     "username": "big bang",
     "password": "45678"
   }
