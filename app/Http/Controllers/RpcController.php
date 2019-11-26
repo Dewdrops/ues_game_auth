@@ -72,7 +72,13 @@ class RpcController extends Controller
 
     public function register(AuthService $service, RpcParams $params)
     {
-        return $service->register($params['app_name'], $params['username'], $params['password']);
+        return $service->register(
+            $params['app_name'],
+            $params['username'],
+            $params['password'],
+            $params->get('email'),
+            $params->get('data')
+        );
     }
 
     public function getOpenid(AuthService $service, RpcParams $params)

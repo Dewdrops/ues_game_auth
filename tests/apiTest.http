@@ -28,7 +28,7 @@ Content-Type: application/json
   "method": "register",
   "params": {
     "app_name": "auth",
-    "username": "good to go",
+    "username": "subarashii",
     "password": "123456"
   }
 }

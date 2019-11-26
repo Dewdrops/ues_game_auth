@@ -32,11 +32,17 @@ class AuthService
         }
     }
 
-    public function register(string $app, string $username, string $password): array
+    public function register(string $app, string $username, string $password, ?string $email, ?array $data): array
     {
         $user = new User();
         $user->password = Hash::make($password);
         $user->username = $username;
+        if (!is_null($email)) {
+            $user->email = $email;
+        }
+        if (!is_null($data)) {
+            $user->data = $data;
+        }
 
         $user->tryInsert();
 
