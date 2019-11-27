@@ -112,7 +112,7 @@ class RpcController extends Controller
 
     public function checkToken(AuthService $service, RpcParams $params)
     {
-        return $service->checkToken($params['token']);
+        return $service->checkToken($params['token'], $params->get('with_data', false));
     }
 
 }

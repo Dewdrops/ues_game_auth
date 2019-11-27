@@ -19,12 +19,20 @@ use Illuminate\Support\Str;
 class AuthService
 {
 
-    public function checkToken(string $token)
+    public function checkToken(string $token, bool $withData = false)
     {
         try {
             $jwtSecret = config('app.jwt.jwt_secret');
             $jwtAlg = config('app.jwt.jwt_alg');
             $decoded = JWT::decode($token, $jwtSecret, [$jwtAlg]);
+
+            if ($withData) {
+                $user = User::findOrFail($decoded->user_id, ['username']);
+                $decoded->_data = [
+                    'username' => $user->username
+                ];
+            }
+
             return $decoded;
         }
         catch (ExpiredException $exception) {
