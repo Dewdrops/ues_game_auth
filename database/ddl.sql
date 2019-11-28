@@ -5,6 +5,7 @@ create table if not exists "users"
     username text not null default '',
     email text not null default '',
     password text not null default '',
+    phone text not null default '',
     wx_unionid text not null default '',
     email_verified boolean not null default false,
     data jsonb not null default '{}',
@@ -14,6 +15,7 @@ create table if not exists "users"
 create unique index uk_wx_unionid on users (wx_unionid) where wx_unionid != '';
 create unique index uk_email on users (email) where email != '';
 create unique index uk_username on users (username) where username != '';
+create index idx_phone on users (phone) where phone != '';
 
 drop table if exists "weapp" cascade;
 create table if not exists "weapp"
