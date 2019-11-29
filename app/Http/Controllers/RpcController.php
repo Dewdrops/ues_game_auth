@@ -81,6 +81,19 @@ class RpcController extends Controller
         );
     }
 
+    public function sendResetPasswordEmail(AuthService $service, RpcParams $params)
+    {
+        $service->sendResetPasswordEmail(
+            $params['email'],
+            $params['callbackUrl']
+        );
+    }
+
+    public function resetPassword(AuthService $service, RpcParams $params)
+    {
+        $service->resetPassword($params['newPassword'], $params['token']);
+    }
+
     public function getOpenid(AuthService $service, RpcParams $params)
     {
         return $service->getOpenid($params['id'], $params['app_name']);

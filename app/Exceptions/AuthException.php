@@ -19,4 +19,6 @@ class AuthException extends \Exception
     const CODE_DUPLICATE_USERNAME = 25;
     const CODE_DUPLICATE_BIND = 26;
     const CODE_INVALID_TOKEN = 27;
+
+    const CODE_TOKEN_INVALID = 101;
 }

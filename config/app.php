@@ -91,4 +91,14 @@ return [
         'valid_user_ids' => env('VALID_DEBUG_USER_IDS'),
     ],
 
+    'rpc' => [
+        'endpoint' => [
+            'notification' => env('JSONRPC_ENDPOINT_NOTIFICATION'),
+        ]
+    ],
+
+    'token' => [
+        'email_link_ttl_hours' => env('EMAIL_LINK_TTL_HOURS')
+    ],
+
 ];

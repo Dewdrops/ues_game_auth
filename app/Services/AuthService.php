@@ -10,11 +10,14 @@ namespace App\Services;
 
 
 use App\Exceptions\AuthException;
+use App\Support\UesRpcClient;
+use App\Token;
 use App\User;
 use Firebase\JWT\ExpiredException;
 use Firebase\JWT\JWT;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use mysql_xdevapi\Exception;
 
 class AuthService
 {
@@ -292,6 +295,69 @@ class AuthService
     {
         $validDebugIds = explode(',', config('app.debug.valid_user_ids'));
         return in_array($id, $validDebugIds);
+    }
+
+    public function sendResetPasswordEmail(string $email, string $callbackUrl)
+    {
+        if (empty($email)) {
+            throw new \Exception('Empty email address');
+        }
+
+        $userId = User::where('email', $email)->first()->id;
+
+        $linkTtl = config('app.token.email_link_ttl_hours');
+        $token = Token::create([
+            'token' => Str::uuid()->toString(),
+            'expired_at' => time() + $linkTtl * 3600,
+            'type' => 'PASSWORD_RESET',
+            'user_id' => $userId,
+        ]);
+
+        $url = $callbackUrl . "?token=" . $token->token;
+
+        $rpc = new UesRpcClient(config('app.rpc.endpoint.notification'));
+        try {
+            $rpc->call(
+                'sendEmail',
+                [
+                    'content' => [
+                        'to' => $email,
+                        'subject' => '衡论科技 - 重置密码',
+                        'text' => "请在{$linkTtl}小时内通过以下链接重置密码：$url",
+                        'html' => "<span style='font-weight:bold'>请在<span style='color:red'>{$linkTtl}小时</span>内通过以下链接重置密码：</span><a href='$url'>$url</a>",
+                    ]
+                ]
+            );
+        }
+        catch (\Exception $exception) {
+            $token->delete();
+            throw $exception;
+        }
+    }
+
+    private function verifyToken(string $tokenVal, int $expiryTime = null)
+    {
+        if (is_null($expiryTime)) {
+            $expiryTime = time();
+        }
+        $token = Token::where('token', $tokenVal)
+                ->where('expired_at' > $expiryTime)
+                ->get();
+        if ($token->isEmpty()) {
+            throw new AuthException("Token [$tokenVal] invalid", AuthException::CODE_TOKEN_INVALID);
+        }
+        return $token->first();
+    }
+
+    public function resetPassword(string $newPassword, string $tokenVal)
+    {
+        $token = $this->verifyToken($tokenVal);
+
+        $user = User::findOrFail($token->user_id, ['id', 'password']);
+        $user->password = $newPassword;
+        $user->save();
+
+        Token::where('token', $token)->update('expired_at', -1);
     }
 
 }
