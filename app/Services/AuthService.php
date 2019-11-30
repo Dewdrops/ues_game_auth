@@ -17,7 +17,6 @@ use Firebase\JWT\ExpiredException;
 use Firebase\JWT\JWT;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
-use mysql_xdevapi\Exception;
 
 class AuthService
 {
@@ -318,13 +317,13 @@ class AuthService
         $rpc = new UesRpcClient(config('app.rpc.endpoint.notification'));
         try {
             $rpc->call(
-                'sendEmail',
+                'sendMail',
                 [
                     'content' => [
                         'to' => $email,
                         'subject' => '衡论科技 - 重置密码',
                         'text' => "请在{$linkTtl}小时内通过以下链接重置密码：$url",
-                        'html' => "<span style='font-weight:bold'>请在<span style='color:red'>{$linkTtl}小时</span>内通过以下链接重置密码：</span><a href='$url'>$url</a>",
+                        'html' => "<span style='font-weight:bold'>请在<span style='color:red'>{$linkTtl}小时内</span>通过以下链接重置密码：</span><a href='$url'>$url</a>",
                     ]
                 ]
             );
@@ -341,7 +340,7 @@ class AuthService
             $expiryTime = time();
         }
         $token = Token::where('token', $tokenVal)
-                ->where('expired_at' > $expiryTime)
+                ->where('expired_at', '>', $expiryTime)
                 ->get();
         if ($token->isEmpty()) {
             throw new AuthException("Token [$tokenVal] invalid", AuthException::CODE_TOKEN_INVALID);
@@ -354,10 +353,12 @@ class AuthService
         $token = $this->verifyToken($tokenVal);
 
         $user = User::findOrFail($token->user_id, ['id', 'password']);
-        $user->password = $newPassword;
+        $user->password = Hash::make($newPassword);
         $user->save();
 
-        Token::where('token', $token)->update('expired_at', -1);
+        Token::where('token', $tokenVal)->update([
+            'expired_at' => -1
+        ]);
     }
 
 }

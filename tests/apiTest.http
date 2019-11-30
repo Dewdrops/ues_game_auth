@@ -118,3 +118,29 @@ Content-Type: application/json
 }
 
 ###
+
+POST http://localhost:5000/rpc?XDEBUG_SESSION_START=14062
+Content-Type: application/json
+
+{
+  "method": "resetPassword",
+  "params": {
+    "id": 2,
+    "app_name": "sea"
+  }
+}
+
+###
+
+POST http://localhost:5000/rpc?XDEBUG_SESSION_START=14062
+Content-Type: application/json
+
+{
+  "method": "sendResetPasswordEmail",
+  "params": {
+    "email": "v_v_4474@126.com",
+    "callbackUrl": "http://127.0.0.1:9111/reset_password"
+  }
+}
+
+###
