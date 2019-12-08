@@ -192,7 +192,7 @@ class AuthService
         $user->save();
         $token = $this->generateToken(['user_id' => $user->id, 'app' => $app], false);
         return [
-            'id' => ['user_id' => $user->id],
+            'id' => $user->id,
             'token' => $token
         ];
     }
