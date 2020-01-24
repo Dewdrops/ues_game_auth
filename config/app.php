@@ -34,6 +34,10 @@ return [
             'app_id' => env('SEA_TTGAME_APP_ID'),
             'secret' => env('SEA_TTGAME_APP_SECRET'),
         ],
+        'mahjong_tt' => [
+            'app_id' => env('MAHJONG_TTGAME_APP_ID'),
+            'secret' => env('MAHJONG_TTGAME_APP_SECRET'),
+        ],
     ],
 
     // EasyWechat configuration
@@ -68,6 +72,15 @@ return [
         'sea' => [
             'app_id' => env('SEA_WECHAT_APP_ID'),
             'secret' => env('SEA_WECHAT_APP_SECRET'),
+            'response_type' => 'array',
+            'log' => [
+                'level' => 'DEBUG',
+                'file' => storage_path('logs/wechat.log'),
+            ],
+        ],
+        'mahjong' => [
+            'app_id' => env('MAHJONG_WECHAT_APP_ID'),
+            'secret' => env('MAHJONG_WECHAT_APP_SECRET'),
             'response_type' => 'array',
             'log' => [
                 'level' => 'DEBUG',

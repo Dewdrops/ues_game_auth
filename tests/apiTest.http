@@ -36,6 +36,18 @@ Content-Type: application/json
 ###
 
 POST http://localhost:5000/rpc?XDEBUG_SESSION_START=17185
+Content-Type: application/json
+
+{
+    "method": "checkToken",
+    "params": {
+        "token": "1223.122323.343434"
+    }
+}
+
+###
+
+POST http://localhost:5000/rpc?XDEBUG_SESSION_START=17185
 Authorization: Bearer Debug-User-Id:2
 Content-Type: application/json
 
