@@ -8,6 +8,14 @@
 
 return [
 
+    'vivogame' => [
+        'pan_vivo' => [
+            'app_id' => env('PAN_VIVOGAME_APP_ID'),
+            'secret' => env('PAN_VIVOGAME_APP_SECRET'),
+            'pkg_name' => env('PAN_VIVOGAME_PKG_NAME'),
+        ],
+    ],
+
     'facebook' => [
         'pan_fb' => [
             'app_id' => env('PAN_FACEBOOK_APP_ID'),

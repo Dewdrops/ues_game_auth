@@ -70,6 +70,9 @@ class AuthService
         if (Str::endsWith(Str::lower($app), '_tt')) {
             return new TtHelper($app);
         }
+        else if (Str::endsWith(Str::lower($app), '_vivo')) {
+            return new VivoHelper($app);
+        }
         else {
             return new WechatHelper($app);
         }
@@ -198,6 +201,11 @@ class AuthService
     }
 
     public function loginByTtgame(string $app, string $code): array
+    {
+        return $this->loginByWechat($app, $code);
+    }
+
+    public function loginByVivo(string $app, string $code): array
     {
         return $this->loginByWechat($app, $code);
     }
@@ -343,7 +351,7 @@ class AuthService
                 ->where('expired_at', '>', $expiryTime)
                 ->get();
         if ($token->isEmpty()) {
-            throw new AuthException("Token [$tokenVal] invalid", AuthException::CODE_TOKEN_INVALID);
+            throw new AuthException("Token [$tokenVal] invalid", AuthException::CODE_INVALID_TOKEN);
         }
         return $token->first();
     }
