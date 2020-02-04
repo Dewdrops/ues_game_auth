@@ -46,6 +46,14 @@ class RpcController extends Controller
         );
     }
 
+    public function loginByVivo(AuthService $service, RpcParams $params)
+    {
+        return $service->loginByVivo(
+            $params['app_name'],
+            $params['code']
+        );
+    }
+
     public function loginByPassword(AuthService $service, RpcParams $params)
     {
         return $service->loginByPassword(
