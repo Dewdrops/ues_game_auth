@@ -10,8 +10,8 @@ return [
 
     'vivogame' => [
         'pan_vivo' => [
-            'app_id' => env('PAN_VIVOGAME_APP_ID'),
-            'secret' => env('PAN_VIVOGAME_APP_SECRET'),
+            'app_key' => env('PAN_VIVOGAME_APP_KEY'),
+            'app_secret' => env('PAN_VIVOGAME_APP_SECRET'),
             'pkg_name' => env('PAN_VIVOGAME_PKG_NAME'),
         ],
     ],

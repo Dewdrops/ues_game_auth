@@ -6,7 +6,7 @@
 # * 'mptr' and 'fptr' create a POST request to submit a form with a text or file field (multipart/form-data);
 
 
-POST http://localhost:5000/rpc?XDEBUG_SESSION_START=15193
+POST http://localhost:5000/rpc?XDEBUG_SESSION_START=18834
 Authorization: Bearer Debug-User-Id:2
 Content-Type: application/json
 
@@ -16,6 +16,19 @@ Content-Type: application/json
     "app_name": "auth",
     "code": "abcd"
   }
+}
+
+###
+
+POST http://localhost:5000/rpc?XDEBUG_SESSION_START=18834
+Content-Type: application/json
+
+{
+    "method": "loginByVivo",
+    "params": {
+        "app_name": "pan_vivo",
+        "code": "9ae03f82e86e8835e25f2e23444cdfc2d59a30395ab0858d064ec310d06eba9c"
+    }
 }
 
 ###

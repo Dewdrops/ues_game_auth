@@ -10,12 +10,7 @@ namespace App\Services;
 
 
 use App\Exceptions\AuthException;
-use App\Exceptions\GamePayException;
-use App\User;
 use GuzzleHttp\Client;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 
 class VivoHelper
 {
@@ -31,18 +26,28 @@ class VivoHelper
         $this->config = config("app.vivogame.{$appName}");
     }
 
+    private function generateNonce(int $digit = 32)
+    {
+        $nonce = '';
+        $nonce .= rand(1, 9);
+        for ($i = 1; $i < $digit; $i++) {
+            $nonce .= rand(0, 9);
+        }
+        return $nonce;
+    }
+
     // http://minigame.vivo.com.cn/documents/#/api/service/newaccount?id=签名生成步骤
     function session(string $code)
     {
-        $timestamp = (int)(microtime(true) * 1000);
-        $nounce = md5(uniqid(microtime(true), true));
+        $timestamp = (string) (int) (microtime(true) * 1000);
+        $nonce = $this->generateNonce();
         $params = [
             'token' => $code,
-            'appKey' => $this->config['app_id'],
-            'appSecret' => $this->config['secret'],
+            'appKey' => $this->config['app_key'],
+            'appSecret' => $this->config['app_secret'],
             'pkgName' => $this->config['pkg_name'],
             'timestamp' => $timestamp,
-            'nonce' => $nounce,
+            'nonce' => $nonce,
         ];
         ksort($params);
         $joined = http_build_query($params);
@@ -58,7 +63,7 @@ class VivoHelper
                 'query' => [
                     'pkgName' => $this->config['pkg_name'],
                     'timestamp' => $timestamp,
-                    'nonce' => $nounce,
+                    'nonce' => $nonce,
                     'token' => $code,
                     'signature' => $signature
                 ]
