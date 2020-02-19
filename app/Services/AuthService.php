@@ -207,7 +207,30 @@ class AuthService
 
     public function loginByVivo(string $app, string $code): array
     {
-        return $this->loginByWechat($app, $code);
+        $driver = new VivoHelper($app);
+        $sessionInfo = $driver->session($code);
+        $openid = $sessionInfo['openid'];
+        $user = User::byWxOpenid($app, $openid, ['id']);
+        if ($user) {
+            $existed = true;
+        }
+        else {
+            $existed = false;
+            $user = new User();
+            $user->save();
+            $user->saveWxCredentials($app, $openid);
+        }
+
+        $token = $this->generateToken(['user_id' => $user->id, 'app' => $app]);
+
+        return [
+            'id' => $user->id,
+            'token' => $token,
+            'nickName' => $sessionInfo['nickName'],
+            'smallAvatar' => $sessionInfo['smallAvatar'],
+            'biggerAvatar' => $sessionInfo['biggerAvatar'],
+            'existed' => $existed,
+        ];
     }
 
     public function loginByFacebook(string $appName, string $signature): array

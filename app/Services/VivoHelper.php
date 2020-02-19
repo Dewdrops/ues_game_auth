@@ -75,8 +75,12 @@ class VivoHelper
             throw new AuthException("Error in Vivogame server login: code[{$ret['code']}], msg[{$ret['msg']}]", AuthException::CODE_AUTH_FAILED);
         }
 
+        $data = $ret['data'];
         return [
-            'openid' => $ret['data']['openId'],
+            'openid' => $data['openId'],
+            'nickName' => $data['nickName'],
+            'smallAvatar' => $data['smallAvatar'],
+            'biggerAvatar' => $data['biggerAvatar'],
         ];
     }
 
