@@ -14,6 +14,21 @@ return [
             'app_secret' => env('PAN_VIVOGAME_APP_SECRET'),
             'pkg_name' => env('PAN_VIVOGAME_PKG_NAME'),
         ],
+        'pipo_vivo' => [
+            'app_key' => env('PIPO_VIVOGAME_APP_KEY'),
+            'app_secret' => env('PIPO_VIVOGAME_APP_SECRET'),
+            'pkg_name' => env('PIPO_VIVOGAME_PKG_NAME'),
+        ],
+        'card_vivo' => [
+            'app_key' => env('CARD_VIVOGAME_APP_KEY'),
+            'app_secret' => env('CARD_VIVOGAME_APP_SECRET'),
+            'pkg_name' => env('CARD_VIVOGAME_PKG_NAME'),
+        ],
+        'sea_vivo' => [
+            'app_key' => env('SEA_VIVOGAME_APP_KEY'),
+            'app_secret' => env('SEA_VIVOGAME_APP_SECRET'),
+            'pkg_name' => env('SEA_VIVOGAME_PKG_NAME'),
+        ],
     ],
 
     'facebook' => [
