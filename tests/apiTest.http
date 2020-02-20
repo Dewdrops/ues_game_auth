@@ -33,6 +33,19 @@ Content-Type: application/json
 
 ###
 
+POST http://localhost:5000/rpc?XDEBUG_SESSION_START=11322
+Content-Type: application/json
+
+{
+    "method": "loginByOppo",
+    "params": {
+        "app_name": "card_oppo",
+        "code": "TN_REgzMGJBbEtad2xZWHExRkhGeFZWTEtGMWM1eUZKSE1NLzNjR2pSN282UlFhM1pDTlMwaUtVY0pRN0FyejhDUQ"
+    }
+}
+
+###
+
 POST http://localhost:5000/rpc?XDEBUG_SESSION_START=17185
 Authorization: Bearer Debug-User-Id:2
 Content-Type: application/json

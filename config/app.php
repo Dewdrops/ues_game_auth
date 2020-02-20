@@ -8,6 +8,19 @@
 
 return [
 
+    'oppogame' => [
+        'card_oppo' => [
+            'app_key' => env('CARD_OPPOGAME_APP_KEY'),
+            'app_secret' => env('CARD_OPPOGAME_APP_SECRET'),
+            'pkg_name' => env('CARD_OPPOGAME_PKG_NAME'),
+        ],
+        'sea_oppo' => [
+            'app_key' => env('SEA_OPPOGAME_APP_KEY'),
+            'app_secret' => env('SEA_OPPOGAME_APP_SECRET'),
+            'pkg_name' => env('SEA_OPPOGAME_PKG_NAME'),
+        ],
+    ],
+
     'vivogame' => [
         'pan_vivo' => [
             'app_key' => env('PAN_VIVOGAME_APP_KEY'),

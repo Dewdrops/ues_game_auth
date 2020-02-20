@@ -71,7 +71,7 @@ class AuthService
             return new TtHelper($app);
         }
         else if (Str::endsWith(Str::lower($app), '_vivo')) {
-            return new VivoHelper($app);
+            return new OppoHelper($app);
         }
         else {
             return new WechatHelper($app);
@@ -203,6 +203,33 @@ class AuthService
     public function loginByTtgame(string $app, string $code): array
     {
         return $this->loginByWechat($app, $code);
+    }
+
+    public function loginByOppo(string $app, string $code): array
+    {
+        $driver = new OppoHelper($app);
+        $sessionInfo = $driver->session($code);
+        $openid = $sessionInfo['userId'];
+        $user = User::byWxOpenid($app, $openid, ['id']);
+        if ($user) {
+            $existed = true;
+        }
+        else {
+            $existed = false;
+            $user = new User();
+            $user->save();
+            $user->saveWxCredentials($app, $openid);
+        }
+
+        $token = $this->generateToken(['user_id' => $user->id, 'app' => $app]);
+
+        return [
+            'id' => $user->id,
+            'token' => $token,
+            'nickName' => $sessionInfo['userName'],
+            'avatar' => $sessionInfo['avatar'],
+            'existed' => $existed,
+        ];
     }
 
     public function loginByVivo(string $app, string $code): array
