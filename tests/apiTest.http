@@ -182,3 +182,17 @@ Content-Type: application/json
 }
 
 ###
+
+POST http://localhost:5000/rpc?XDEBUG_SESSION_START=15467
+Content-Type: application/json
+
+{
+    "method": "updateRank",
+    "params": {
+        "app_name": "card_oppo",
+        "id": 53,
+        "score": 45
+    }
+}
+
+###

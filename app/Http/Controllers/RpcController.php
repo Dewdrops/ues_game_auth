@@ -11,6 +11,7 @@ namespace App\Http\Controllers;
 
 use App\Services\AuthService;
 use App\Services\GamePayService;
+use App\Services\RankService;
 use App\Support\RpcParams;
 use App\Traits\UesRpcDispatcher;
 use Laravel\Lumen\Routing\Controller;
@@ -127,6 +128,11 @@ class RpcController extends Controller
         return $service->bindPassword(
             $params['id'], $params['app_name'], $params['username'], $params['password'], $params->get("allowRefresh", false)
         );
+    }
+
+    public function updateRank(RankService $service, RpcParams $params)
+    {
+        $service->updateRank($params['app_name'], $params['id'], $params['score']);
     }
 
     public function getBalance(GamePayService $service, RpcParams $params)
