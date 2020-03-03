@@ -19,6 +19,21 @@ return [
             'app_secret' => env('SEA_OPPOGAME_APP_SECRET'),
             'pkg_name' => env('SEA_OPPOGAME_PKG_NAME'),
         ],
+        'pan_oppo' => [
+            'app_key' => env('PAN_OPPOGAME_APP_KEY'),
+            'app_secret' => env('PAN_OPPOGAME_APP_SECRET'),
+            'pkg_name' => env('PAN_OPPOGAME_PKG_NAME'),
+        ],
+        'pipo_oppo' => [
+            'app_key' => env('PIPO_OPPOGAME_APP_KEY'),
+            'app_secret' => env('PIPO_OPPOGAME_APP_SECRET'),
+            'pkg_name' => env('PIPO_OPPOGAME_PKG_NAME'),
+        ],
+        'fly_oppo' => [
+            'app_key' => env('FLY_OPPOGAME_APP_KEY'),
+            'app_secret' => env('FLY_OPPOGAME_APP_SECRET'),
+            'pkg_name' => env('FLY_OPPOGAME_PKG_NAME'),
+        ],
     ],
 
     'vivogame' => [

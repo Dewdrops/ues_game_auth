@@ -103,7 +103,7 @@ class OppoHelper
         $ret = json_decode($resp->getBody()->getContents(), true);
 
         if ($ret['errCode'] !== "200") {
-            throw new AuthException("Error in Oppogame update rank: code[{$ret['errCode']}], msg[{$ret['errMsg']}]", AuthException::CODE_AUTH_FAILED);
+            throw new AuthException("Error in Oppogame update rank: userId[$userId], score[$score], code[{$ret['errCode']}], msg[{$ret['errMsg']}]", AuthException::CODE_AUTH_FAILED);
         }
     }
 
