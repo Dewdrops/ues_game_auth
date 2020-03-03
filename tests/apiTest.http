@@ -27,20 +27,20 @@ Content-Type: application/json
     "method": "loginByVivo",
     "params": {
         "app_name": "pan_vivo",
-        "code": "9ae03f82e86e8835e25f2e23444cdfc2d59a30395ab0858d064ec310d06eba9c"
+        "code": "47864819cfd8ef76fa0417824ac04e9737234ad1529ed68a3f0c26e4298a8599"
     }
 }
 
 ###
 
-POST http://localhost:5000/rpc?XDEBUG_SESSION_START=11322
+POST http://localhost:5000/rpc?XDEBUG_SESSION_START=10572
 Content-Type: application/json
 
 {
     "method": "loginByOppo",
     "params": {
         "app_name": "card_oppo",
-        "code": "TN_REgzMGJBbEtad2xZWHExRkhGeFZWTEtGMWM1eUZKSE1NLzNjR2pSN282UlFhM1pDTlMwaUtVY0pRN0FyejhDUQ"
+        "code": "TN_Ry9veFdVV2NyMGZERWFFRFplWHFTQkU2QjVjY1R4UXNDZ0p3aUIrZVpNQlFscTMySjRVZ3k2VThVK2FtMFB2Sg"
     }
 }
 

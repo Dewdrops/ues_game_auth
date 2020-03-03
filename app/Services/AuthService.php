@@ -200,9 +200,9 @@ class AuthService
         ];
     }
 
-    public function loginByTtgame(string $app, string $code): array
+    public function loginByTtgame(string $app, string $code, array $userInfo = null): array
     {
-        return $this->loginByWechat($app, $code);
+        return $this->loginByWechat($app, $code, $userInfo);
     }
 
     public function loginByOppo(string $app, string $code): array
@@ -218,8 +218,11 @@ class AuthService
             $existed = false;
             $user = new User();
             $user->save();
-            $user->saveWxCredentials($app, $openid);
         }
+        $user->saveWxCredentials($app, $openid, [
+            'nickname' => $sessionInfo['userName'],
+            'avatarUrl' => $sessionInfo['avatar']
+        ]);
 
         $token = $this->generateToken(['user_id' => $user->id, 'app' => $app]);
 
@@ -245,8 +248,11 @@ class AuthService
             $existed = false;
             $user = new User();
             $user->save();
-            $user->saveWxCredentials($app, $openid);
         }
+        $user->saveWxCredentials($app, $openid, [
+            'nickname' => $sessionInfo['nickName'],
+            'avatarUrl' => $sessionInfo['smallAvatar'],
+        ]);
 
         $token = $this->generateToken(['user_id' => $user->id, 'app' => $app]);
 
@@ -260,11 +266,11 @@ class AuthService
         ];
     }
 
-    public function loginByFacebook(string $appName, string $signature): array
+    public function loginByFacebook(string $app, string $signature, array $userInfo = null): array
     {
         $exploded = explode('.', $signature);
         $sig = base64_decode(str_replace(array('-', '_'), array('+', '/'), $exploded[0]));
-        $hash = hash_hmac('sha256', $exploded[1], config("app.facebook.{$appName}.secret"), true);
+        $hash = hash_hmac('sha256', $exploded[1], config("app.facebook.{$app}.secret"), true);
         if ($hash !== $sig) {
             throw new AuthException('Facebook signature invalid', AuthException::CODE_AUTH_FAILED);
         }
@@ -272,7 +278,7 @@ class AuthService
         $data = json_decode(base64_decode($exploded[1]), true);
 
         $openid = $data['player_id'];
-        $user = User::byWxOpenid($appName, $openid, ['id']);
+        $user = User::byWxOpenid($app, $openid, ['id']);
         if ($user) {
             $existed = true;
         }
@@ -280,12 +286,15 @@ class AuthService
             $existed = false;
             $user = new User();
             $user->save();
-            $user->saveWxCredentials($appName, $openid);
+        }
+
+        if (!$existed || $userInfo) {
+            $user->saveWxCredentials($app, $openid, $userInfo);
         }
 
         $token = $this->generateToken([
             'user_id' => $user->id,
-            'app' => $appName,
+            'app' => $app,
         ]);
 
         $ret = [
@@ -300,7 +309,7 @@ class AuthService
         return $ret;
     }
 
-    public function loginByWechat(string $app, string $code, $iv = null, $encrypted = null): array
+    public function loginByWechat(string $app, string $code, array $userInfo = null): array
     {
         $driver = $this->getPlatformDriver($app);
         $sessionInfo = $driver->session($code);
@@ -313,7 +322,10 @@ class AuthService
             $existed = false;
             $user = new User();
             $user->save();
-            $user->saveWxCredentials($app, $openid);
+        }
+
+        if (!$existed || $userInfo) {
+            $user->saveWxCredentials($app, $openid, $userInfo);
         }
 
         $token = $this->generateToken(['user_id' => $user->id, 'app' => $app]);

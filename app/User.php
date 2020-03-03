@@ -4,6 +4,7 @@ namespace App;
 
 use App\Exceptions\AuthException;
 use Illuminate\Auth\Authenticatable;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Laravel\Lumen\Auth\Authorizable;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
@@ -73,7 +74,7 @@ class User extends BaseModel implements AuthenticatableContract, AuthorizableCon
         }
     }
 
-    public function saveWxCredentials(string $appName, string $wxOpenid)
+    public function saveWxCredentials(string $appName, string $wxOpenid, array $userInfo = null)
     {
         $attrs = [
             'app_name' => $appName,
@@ -81,6 +82,18 @@ class User extends BaseModel implements AuthenticatableContract, AuthorizableCon
         ];
         $row = array_replace([], $attrs);
         $row['wx_openid'] = $wxOpenid;
+
+        if ($userInfo) {
+            $avatarUrl = Arr::get($userInfo, 'avatarUrl');
+            if ($avatarUrl) {
+                $row['avatar_url'] = $avatarUrl;
+            }
+            $nickname = Arr::get($userInfo, 'nickname');
+            if ($nickname) {
+                $row['nickname'] = $nickname;
+            }
+        }
+
         try {
             DB::table(self::WX_CRED_TABLE)
                 ->updateOrInsert($attrs, $row);

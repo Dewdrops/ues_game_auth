@@ -24,6 +24,8 @@ create table if not exists "weapp"
     app_name text not null,
     wx_openid text not null,
     user_id int4 references users(id),
+    avatar_url text not null default '',
+    nickname text not null default '',
     created_at timestamptz not null default current_timestamp,
     updated_at timestamptz not null default current_timestamp
 );

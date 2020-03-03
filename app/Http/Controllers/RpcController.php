@@ -26,8 +26,7 @@ class RpcController extends Controller
         return $service->loginByWechat(
             $params['app_name'],
             $params['code'],
-            $params->get('iv'),
-            $params->get('encrypted')
+            $params->get('userInfo')
         );
     }
 
@@ -35,7 +34,8 @@ class RpcController extends Controller
     {
         return $service->loginByFacebook(
             $params['app_name'],
-            $params['signature']
+            $params['signature'],
+            $params->get('userInfo')
         );
     }
 
@@ -43,7 +43,8 @@ class RpcController extends Controller
     {
         return $service->loginByTtgame(
             $params['app_name'],
-            $params['code']
+            $params['code'],
+            $params->get('userInfo')
         );
     }
 
