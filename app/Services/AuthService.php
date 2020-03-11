@@ -266,6 +266,34 @@ class AuthService
         ];
     }
 
+    public function loginByMi(string $app, string $session, string $uid, array $userInfo = null): array
+    {
+        $driver = new MiHelper($app);
+        $sessionInfo = $driver->session($session, $uid);
+        $openid = $sessionInfo['openid'];
+        $user = User::byWxOpenid($app, $openid, ['id']);
+        if ($user) {
+            $existed = true;
+        }
+        else {
+            $existed = false;
+            $user = new User();
+            $user->save();
+        }
+
+        if (!$existed || $userInfo) {
+            $user->saveWxCredentials($app, $openid, $userInfo);
+        }
+
+        $token = $this->generateToken(['user_id' => $user->id, 'app' => $app]);
+
+        return [
+            'id' => $user->id,
+            'token' => $token,
+            'existed' => $existed,
+        ];
+    }
+
     public function loginByFacebook(string $app, string $signature, array $userInfo = null): array
     {
         $exploded = explode('.', $signature);

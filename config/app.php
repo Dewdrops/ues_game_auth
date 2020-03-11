@@ -8,6 +8,13 @@
 
 return [
 
+    'migame' => [
+        'card_mi' => [
+            'app_id' => env('CARD_MI_APP_ID'),
+            'app_secret' => env('CARD_MI_APP_SECRET'),
+        ],
+    ],
+
     'oppogame' => [
         'card_oppo' => [
             'app_key' => env('CARD_OPPOGAME_APP_KEY'),

@@ -46,6 +46,20 @@ Content-Type: application/json
 
 ###
 
+POST http://localhost:5000/rpc?XDEBUG_SESSION_START=10572
+Content-Type: application/json
+
+{
+    "method": "loginByMi",
+    "params": {
+        "app_name": "card_mi",
+        "session": "T",
+        "uid": ""
+    }
+}
+
+###
+
 POST http://localhost:5000/rpc?XDEBUG_SESSION_START=17185
 Authorization: Bearer Debug-User-Id:2
 Content-Type: application/json
