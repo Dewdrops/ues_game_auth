@@ -96,6 +96,10 @@ return [
             'app_id' => env('MAHJONG_TTGAME_APP_ID'),
             'secret' => env('MAHJONG_TTGAME_APP_SECRET'),
         ],
+        'cocokun_tt' => [
+            'app_id' => env('COCOKUN_TTGAME_APP_ID'),
+            'secret' => env('COCOKUN_TTGAME_APP_SECRET'),
+        ],
     ],
 
     // EasyWechat configuration
@@ -139,6 +143,15 @@ return [
         'mahjong' => [
             'app_id' => env('MAHJONG_WECHAT_APP_ID'),
             'secret' => env('MAHJONG_WECHAT_APP_SECRET'),
+            'response_type' => 'array',
+            'log' => [
+                'level' => 'DEBUG',
+                'file' => storage_path('logs/wechat.log'),
+            ],
+        ],
+        'cocokun_wx' => [
+            'app_id' => env('COCOKUN_WECHAT_APP_ID'),
+            'secret' => env('COCOKUN_WECHAT_APP_SECRET'),
             'response_type' => 'array',
             'log' => [
                 'level' => 'DEBUG',
