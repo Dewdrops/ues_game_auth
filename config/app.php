@@ -41,6 +41,11 @@ return [
             'app_secret' => env('FLY_OPPOGAME_APP_SECRET'),
             'pkg_name' => env('FLY_OPPOGAME_PKG_NAME'),
         ],
+        'cocokun_oppo' => [
+            'app_key' => env('COCOKUN_OPPOGAME_APP_KEY'),
+            'app_secret' => env('COCOKUN_OPPOGAME_APP_SECRET'),
+            'pkg_name' => env('COCOKUN_OPPOGAME_PKG_NAME'),
+        ],
     ],
 
     'vivogame' => [
