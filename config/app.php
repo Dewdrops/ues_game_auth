@@ -110,6 +110,10 @@ return [
             'app_id' => env('COCOKUN_TTGAME_APP_ID'),
             'secret' => env('COCOKUN_TTGAME_APP_SECRET'),
         ],
+        'rect_tt' => [
+            'app_id' => env('RECT_TTGAME_APP_ID'),
+            'secret' => env('RECT_TTGAME_APP_SECRET'),
+        ],
     ],
 
     // EasyWechat configuration
