@@ -46,6 +46,11 @@ return [
             'app_secret' => env('COCOKUN_OPPOGAME_APP_SECRET'),
             'pkg_name' => env('COCOKUN_OPPOGAME_PKG_NAME'),
         ],
+        'mahjong_oppo' => [
+            'app_key' => env('MAHJONG_OPPOGAME_APP_KEY'),
+            'app_secret' => env('MAHJONG_OPPOGAME_APP_SECRET'),
+            'pkg_name' => env('MAHJONG_OPPOGAME_PKG_NAME'),
+        ],
     ],
 
     'vivogame' => [
