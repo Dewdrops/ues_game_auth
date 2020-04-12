@@ -220,9 +220,12 @@ class AuthService
             $user = new User();
             $user->save();
         }
+
+        $userName = Arr::get($sessionInfo, 'userName', null);
+        $avatarUrl = Arr::get($sessionInfo, 'avatar', null);
         $user->saveWxCredentials($app, $openid, [
-            'nickname' => Arr::get($sessionInfo, 'userName', null),
-            'avatarUrl' => Arr::get($sessionInfo,'avatar', null)
+            'nickname' => $userName,
+            'avatarUrl' => $avatarUrl
         ]);
 
         $token = $this->generateToken(['user_id' => $user->id, 'app' => $app]);
@@ -230,8 +233,8 @@ class AuthService
         return [
             'id' => $user->id,
             'token' => $token,
-            'nickName' => $sessionInfo['userName'],
-            'avatar' => $sessionInfo['avatar'],
+            'nickName' => $userName,
+            'avatar' => $avatarUrl,
             'existed' => $existed,
         ];
     }
