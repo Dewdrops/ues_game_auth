@@ -15,6 +15,7 @@ use App\Token;
 use App\User;
 use Firebase\JWT\ExpiredException;
 use Firebase\JWT\JWT;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
@@ -220,8 +221,8 @@ class AuthService
             $user->save();
         }
         $user->saveWxCredentials($app, $openid, [
-            'nickname' => $sessionInfo['userName'],
-            'avatarUrl' => $sessionInfo['avatar']
+            'nickname' => Arr::get($sessionInfo, 'userName', null),
+            'avatarUrl' => Arr::get($sessionInfo,'avatar', null)
         ]);
 
         $token = $this->generateToken(['user_id' => $user->id, 'app' => $app]);
