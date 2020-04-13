@@ -64,6 +64,11 @@ return [
             'app_secret' => env('PIPO_VIVOGAME_APP_SECRET'),
             'pkg_name' => env('PIPO_VIVOGAME_PKG_NAME'),
         ],
+        'fly_vivo' => [
+            'app_key' => env('FLY_VIVOGAME_APP_KEY'),
+            'app_secret' => env('FLY_VIVOGAME_APP_SECRET'),
+            'pkg_name' => env('FLY_VIVOGAME_PKG_NAME'),
+        ],
         'card_vivo' => [
             'app_key' => env('CARD_VIVOGAME_APP_KEY'),
             'app_secret' => env('CARD_VIVOGAME_APP_SECRET'),
@@ -102,6 +107,10 @@ return [
         'pipo_tt' => [
             'app_id' => env('PIPO_TTGAME_APP_ID'),
             'secret' => env('PIPO_TTGAME_APP_SECRET'),
+        ],
+        'fly_tt' => [
+            'app_id' => env('FLY_TTGAME_APP_ID'),
+            'secret' => env('FLY_TTGAME_APP_SECRET'),
         ],
         'sea_tt' => [
             'app_id' => env('SEA_TTGAME_APP_ID'),
