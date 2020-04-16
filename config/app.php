@@ -84,6 +84,11 @@ return [
             'app_secret' => env('COCOKUN_VIVOGAME_APP_SECRET'),
             'pkg_name' => env('COCOKUN_VIVOGAME_PKG_NAME'),
         ],
+        'rect_vivo' => [
+            'app_key' => env('RECT_VIVOGAME_APP_KEY'),
+            'app_secret' => env('RECT_VIVOGAME_APP_SECRET'),
+            'pkg_name' => env('RECT_VIVOGAME_PKG_NAME'),
+        ],
     ],
 
     'facebook' => [
