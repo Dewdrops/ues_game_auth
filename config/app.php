@@ -121,6 +121,10 @@ return [
             'app_id' => env('SEA_TTGAME_APP_ID'),
             'secret' => env('SEA_TTGAME_APP_SECRET'),
         ],
+        'sea_high_tt' => [
+            'app_id' => env('SEA_HIGH_TTGAME_APP_ID'),
+            'secret' => env('SEA_HIGH_TTGAME_APP_SECRET'),
+        ],
         'mahjong_tt' => [
             'app_id' => env('MAHJONG_TTGAME_APP_ID'),
             'secret' => env('MAHJONG_TTGAME_APP_SECRET'),
