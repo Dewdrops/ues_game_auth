@@ -10,6 +10,7 @@ namespace App\Services;
 
 
 use App\Exceptions\AuthException;
+use App\Support\ASDecoder;
 use App\Support\UesRpcClient;
 use App\Token;
 use App\User;
@@ -266,6 +267,33 @@ class AuthService
             'nickName' => $sessionInfo['nickName'],
             'smallAvatar' => $sessionInfo['smallAvatar'],
             'biggerAvatar' => $sessionInfo['biggerAvatar'],
+            'existed' => $existed,
+        ];
+    }
+
+    public function loginByApple(string $app, string $code, array $userInfo = null): array
+    {
+        $payload = ASDecoder::getAppleSignInPayload($code);
+        $openid = $payload->getUser();
+        $user = User::byWxOpenid($app, $openid, ['id']);
+        if ($user) {
+            $existed = true;
+        }
+        else {
+            $existed = false;
+            $user = new User();
+            $user->save();
+        }
+
+        if (!$existed || $userInfo) {
+            $user->saveWxCredentials($app, $openid, $userInfo);
+        }
+
+        $token = $this->generateToken(['user_id' => $user->id, 'app' => $app]);
+
+        return [
+            'id' => $user->id,
+            'token' => $token,
             'existed' => $existed,
         ];
     }
