@@ -66,7 +66,7 @@ class RpcController extends Controller
 
     public function loginByApple(AuthService $service, RpcParams $params)
     {
-        return $service->loginByMi(
+        return $service->loginByApple(
             $params['app_name'],
             $params['code'],
             $params->get('userInfo')
