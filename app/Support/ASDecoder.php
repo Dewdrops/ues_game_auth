@@ -74,7 +74,9 @@ class ASDecoder
 
         $kids = array_column($decodedPublicKeys['keys'], 'kid');
         $parsedKeyData = $decodedPublicKeys['keys'][array_search($publicKeyKid, $kids)];
-        $parsedPublicKey= JWK::parseKeySet([$parsedKeyData])[0];
+        $parsedPublicKey= JWK::parseKeySet([
+            "keys" => [$parsedKeyData]
+        ])[0];
         $publicKeyDetails = openssl_pkey_get_details($parsedPublicKey);
 
         if(!isset($publicKeyDetails['key'])) {
