@@ -33,7 +33,7 @@ class ASDecoder
      * @return object
      */
     public static function decodeIdentityToken(string $identityToken) : object {
-        $publicKeyKid = JWT::getPublicKeyKid($identityToken);
+        $publicKeyKid = self::getPublicKeyKid($identityToken);
 
         $publicKeyData = self::fetchPublicKey($publicKeyKid);
 
@@ -43,6 +43,18 @@ class ASDecoder
         $payload = JWT::decode($identityToken, $publicKey, [$alg]);
 
         return $payload;
+    }
+
+    public static function getPublicKeyKid(string $jwt) : object {
+        $tks = explode('.', $jwt);
+        if (count($tks) != 3) {
+            throw new \Exception('Wrong number of segments');
+        }
+        list($headb64, $_bodyb64, $_cryptob64) = $tks;
+        if (null === ($header = JWT::jsonDecode(JWT::urlsafeB64Decode($headb64)))) {
+            throw new \Exception('Invalid header encoding');
+        }
+        return $header->kid;
     }
 
     /**
