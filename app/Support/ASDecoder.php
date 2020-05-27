@@ -45,7 +45,7 @@ class ASDecoder
         return $payload;
     }
 
-    public static function getPublicKeyKid(string $jwt) : object {
+    public static function getPublicKeyKid(string $jwt) {
         $tks = explode('.', $jwt);
         if (count($tks) != 3) {
             throw new \Exception('Wrong number of segments');
