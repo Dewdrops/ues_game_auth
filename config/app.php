@@ -89,6 +89,11 @@ return [
             'app_secret' => env('RECT_VIVOGAME_APP_SECRET'),
             'pkg_name' => env('RECT_VIVOGAME_PKG_NAME'),
         ],
+        'triple_vivo' => [
+            'app_key' => env('TRIPLE_VIVOGAME_APP_KEY'),
+            'app_secret' => env('TRIPLE_VIVOGAME_APP_SECRET'),
+            'pkg_name' => env('TRIPLE_VIVOGAME_PKG_NAME'),
+        ],
     ],
 
     'facebook' => [
