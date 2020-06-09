@@ -72,8 +72,8 @@ class AuthService
         if (Str::endsWith(Str::lower($app), '_tt')) {
             return new TtHelper($app);
         }
-        else if (Str::endsWith(Str::lower($app), '_vivo')) {
-            return new OppoHelper($app);
+        else if (Str::endsWith(Str::lower($app), '_bl')) {
+            return new BilibiliHelper($app);
         }
         else {
             return new WechatHelper($app);
@@ -200,6 +200,11 @@ class AuthService
             'id' => $user->id,
             'token' => $token
         ];
+    }
+
+    public function loginByBlgame(string $app, string $code, array $userInfo = null): array
+    {
+        return $this->loginByWechat($app, $code, $userInfo);
     }
 
     public function loginByTtgame(string $app, string $code, array $userInfo = null): array
