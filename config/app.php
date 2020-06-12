@@ -142,6 +142,10 @@ return [
             'app_id' => env('RECT_TTGAME_APP_ID'),
             'secret' => env('RECT_TTGAME_APP_SECRET'),
         ],
+        'camera_tt' => [
+            'app_id' => env('CAMERA_TTGAME_APP_ID'),
+            'secret' => env('CAMERA_TTGAME_APP_SECRET'),
+        ],
         'triple_tt' => [
             'app_id' => env('TRIPLE_TTGAME_APP_ID'),
             'secret' => env('TRIPLE_TTGAME_APP_SECRET'),
