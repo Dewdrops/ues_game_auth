@@ -39,6 +39,15 @@ class RpcController extends Controller
         );
     }
 
+    public function loginByBlgame(AuthService $service, RpcParams $params)
+    {
+        return $service->loginByBlgame(
+            $params['app_name'],
+            $params['code'],
+            $params->get('userInfo')
+        );
+    }
+
     public function loginByTtgame(AuthService $service, RpcParams $params)
     {
         return $service->loginByTtgame(
