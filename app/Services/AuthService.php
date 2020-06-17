@@ -70,10 +70,13 @@ class AuthService
     private function getPlatformDriver(string $app)
     {
         if (Str::endsWith(Str::lower($app), '_tt')) {
-            return new TtHelper($app);
+            return new QqgameHelper($app);
         }
         else if (Str::endsWith(Str::lower($app), '_bl')) {
             return new BilibiliHelper($app);
+        }
+        else if (Str::endsWith(Str::lower($app), '_qq')) {
+            return new QqgameHelper($app);
         }
         else {
             return new WechatHelper($app);
@@ -208,6 +211,11 @@ class AuthService
     }
 
     public function loginByTtgame(string $app, string $code, array $userInfo = null): array
+    {
+        return $this->loginByWechat($app, $code, $userInfo);
+    }
+
+    public function loginByQqgame(string $app, string $code, array $userInfo = null): array
     {
         return $this->loginByWechat($app, $code, $userInfo);
     }

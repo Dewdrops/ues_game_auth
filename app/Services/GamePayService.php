@@ -21,7 +21,7 @@ class GamePayService
 
     public function getBalance(int $id, string $appName)
     {
-        $driver = new TtHelper($appName);
+        $driver = new QqgameHelper($appName);
         $user = User::findOrFail($id);
 
         $ret = $driver->getBalance($user);
@@ -43,7 +43,7 @@ class GamePayService
 
     public function gamePay(int $id, string $appName, int $amount, ?string $billNo)
     {
-        $driver = new TtHelper($appName);
+        $driver = new QqgameHelper($appName);
         $user = User::findOrFail($id);
 
         if ($billNo === null) {
