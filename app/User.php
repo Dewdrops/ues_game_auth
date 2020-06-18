@@ -101,7 +101,7 @@ class User extends BaseModel implements AuthenticatableContract, AuthorizableCon
         catch (\Exception $e) {
             if ($e->getCode() === "23505") {
                 throw new AuthException(
-                    "Duplicate wechat credentials",
+                    "Duplicate openid credentials",
                     AuthException::CODE_DUPLICATE_USERNAME
                 );
             }
