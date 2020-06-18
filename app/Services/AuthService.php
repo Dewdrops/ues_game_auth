@@ -70,7 +70,7 @@ class AuthService
     private function getPlatformDriver(string $app)
     {
         if (Str::endsWith(Str::lower($app), '_tt')) {
-            return new QqgameHelper($app);
+            return new TtHelper($app);
         }
         else if (Str::endsWith(Str::lower($app), '_bl')) {
             return new BilibiliHelper($app);
