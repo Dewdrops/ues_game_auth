@@ -11,7 +11,7 @@ return [
     'qqgame' => [
         'card_qq' => [
             'app_id' => env('CARD_QQGAME_APP_ID'),
-            'app_secret' => env('CARD_QQGAME_APP_SECRET'),
+            'secret' => env('CARD_QQGAME_APP_SECRET'),
         ],
     ],
 
