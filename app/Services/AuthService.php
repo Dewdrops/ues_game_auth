@@ -207,17 +207,17 @@ class AuthService
 
     public function loginByBlgame(string $app, string $code, array $userInfo = null): array
     {
-        return $this->loginByWechat($app, $code, $userInfo);
+        return $this->loginByWechat($app, 'BILIBILI', $code, $userInfo);
     }
 
     public function loginByTtgame(string $app, string $code, array $userInfo = null): array
     {
-        return $this->loginByWechat($app, $code, $userInfo);
+        return $this->loginByWechat($app, 'TTGAME', $code, $userInfo);
     }
 
     public function loginByQqgame(string $app, string $code, array $userInfo = null): array
     {
-        return $this->loginByWechat($app, $code, $userInfo);
+        return $this->loginByWechat($app, 'QQGAME', $code, $userInfo);
     }
 
     public function loginByOppo(string $app, string $code): array
@@ -237,7 +237,7 @@ class AuthService
 
         $userName = Arr::get($sessionInfo, 'userName', null);
         $avatarUrl = Arr::get($sessionInfo, 'avatar', null);
-        $user->saveWxCredentials($app, $openid, [
+        $user->saveWxCredentials($app, 'OPPO', $openid, [
             'nickname' => $userName,
             'avatarUrl' => $avatarUrl
         ]);
@@ -267,7 +267,7 @@ class AuthService
             $user = new User();
             $user->save();
         }
-        $user->saveWxCredentials($app, $openid, [
+        $user->saveWxCredentials($app, 'VIVO', $openid, [
             'nickname' => $sessionInfo['nickName'],
             'avatarUrl' => $sessionInfo['smallAvatar'],
         ]);
@@ -299,7 +299,7 @@ class AuthService
         }
 
         if (!$existed || $userInfo) {
-            $user->saveWxCredentials($app, $openid, $userInfo);
+            $user->saveWxCredentials($app, 'APPLE', $openid, $userInfo);
         }
 
         $token = $this->generateToken(['user_id' => $user->id, 'app' => $app]);
@@ -327,7 +327,7 @@ class AuthService
         }
 
         if (!$existed || $userInfo) {
-            $user->saveWxCredentials($app, $openid, $userInfo);
+            $user->saveWxCredentials($app, 'XIAOMI', $openid, $userInfo);
         }
 
         $token = $this->generateToken(['user_id' => $user->id, 'app' => $app]);
@@ -362,7 +362,7 @@ class AuthService
         }
 
         if (!$existed || $userInfo) {
-            $user->saveWxCredentials($app, $openid, $userInfo);
+            $user->saveWxCredentials($app, 'FACEBOOK', $openid, $userInfo);
         }
 
         $token = $this->generateToken([
@@ -382,7 +382,7 @@ class AuthService
         return $ret;
     }
 
-    public function loginByWechat(string $app, string $code, array $userInfo = null): array
+    public function loginByWechat(string $app, string $type, string $code, array $userInfo = null): array
     {
         $driver = $this->getPlatformDriver($app);
         $sessionInfo = $driver->session($code);
@@ -398,7 +398,7 @@ class AuthService
         }
 
         if (!$existed || $userInfo) {
-            $user->saveWxCredentials($app, $openid, $userInfo);
+            $user->saveWxCredentials($app, $type, $openid, $userInfo);
         }
 
         $token = $this->generateToken(['user_id' => $user->id, 'app' => $app]);

@@ -25,6 +25,7 @@ class RpcController extends Controller
     {
         return $service->loginByWechat(
             $params['app_name'],
+            'WECHAT',
             $params['code'],
             $params->get('userInfo')
         );

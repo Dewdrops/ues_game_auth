@@ -74,7 +74,7 @@ class User extends BaseModel implements AuthenticatableContract, AuthorizableCon
         }
     }
 
-    public function saveWxCredentials(string $appName, string $wxOpenid, array $userInfo = null)
+    public function saveWxCredentials(string $appName, string $type, string $wxOpenid, array $userInfo = null)
     {
         $attrs = [
             'app_name' => $appName,
@@ -82,6 +82,7 @@ class User extends BaseModel implements AuthenticatableContract, AuthorizableCon
         ];
         $row = array_replace([], $attrs);
         $row['wx_openid'] = $wxOpenid;
+        $row['auth_type'] = $type;
 
         if ($userInfo) {
             $avatarUrl = Arr::get($userInfo, 'avatarUrl');
